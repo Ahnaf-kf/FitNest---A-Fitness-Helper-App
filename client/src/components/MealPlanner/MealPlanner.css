@@ -1,0 +1,66 @@
+.planner-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.planner-main {
+  flex: 1;
+  padding: 20px;
+  background: var(--bg-color);
+  box-sizing: border-box;
+  color: var(--text-light);
+}
+
+.planner-content {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.planner-content h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.btn-shuffle, .btn-save {
+  background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+  border: none;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin: 0.5rem;
+}
+
+.planner-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.planner-table th,
+.planner-table td {
+  border: 1px solid #444;
+  padding: 8px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.slot-name {
+  text-transform: capitalize;
+  font-weight: bold;
+}
+
+.planner-table select {
+  width: 100%;
+  padding: 4px;
+  border-radius: 4px;
+  background: #1f1f1f;
+  color: #fff;
+  border: 1px solid #444;
+}
+
+.planner-loading {
+  color: var(--text-light);
+  text-align: center;
+  margin-top: 2rem;
+}

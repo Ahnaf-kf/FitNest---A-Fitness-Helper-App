@@ -1,0 +1,307 @@
+.diet-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.diet-main {
+  flex: 1;
+  background: var(--bg-color);
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+.diet-content {
+  max-width: 1000px;
+  margin: 30px auto 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Top placeholder box */
+.weekly-plan-box {
+  background: var(--card-bg);
+  color: var(--text-light);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  padding: 5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+.weekly-plan-box:hover {
+  transform: translateY(5px);
+  background: rgba(30,30,30,0.9);
+}
+
+/* Three feature cards */
+.feature-cards {
+  display: flex;
+  gap: 20px;
+}
+
+.feature-card {
+  flex: 1;
+  background: var(--card-bg);
+  color: var(--text-light);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  padding: 3.5rem;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.feature-card:hover {
+  transform: translateY(-3px);
+  background: rgba(30,30,30,0.9);
+}
+
+.feature-card h3 {
+  margin-top: 0;
+}
+
+.feature-card p {
+  color: var(--text-muted);
+}
+
+.notes-card {
+  flex: 1.5;
+  background: var(--card-bg);
+  color: var(--text-light);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.notes-list {
+  max-height: 120px;
+  overflow-y: auto;
+  border: 1px solid #444;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.note-item {
+  background: #333;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+}
+
+.no-notes {
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+.note-input {
+  width: 100%;
+  min-height: 60px;
+  padding: 0.5rem;
+  background: #1f1f1f;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #fff;
+  resize: vertical;
+}
+
+.add-note-btn {
+  align-self: flex-end;
+  background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+  border: none;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.add-note-btn:hover {
+  opacity: 0.9;
+}
+
+.note-view,
+.note-editing {
+  background: #333;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.note-text {
+  flex: 1;
+  color: #fff;
+}
+
+.note-buttons-inline button {
+  margin-left: 0.5rem;
+  background: transparent;
+  border: 1px solid var(--gradient-start);
+  color: var(--gradient-start);
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.note-buttons-inline button:hover {
+  background: var(--gradient-start);
+  color: #000;
+}
+
+.note-input-inline {
+  flex: 1;
+  background: #1f1f1f;
+  border: 1px solid #444;
+  color: #fff;
+  padding: 0.5rem;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+.notes-list {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* centered modal box with blurred backdrop */
+.modal {
+  background: var(--card-bg);
+  backdrop-filter: blur(8px);
+  padding: 2rem;
+  border-radius: var(--card-radius);
+  width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--card-shadow);
+  color: var(--text-light);
+}
+
+/* row for each food-element + grams inputs */
+.item-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.item-row input {
+  flex: 1;
+  background: #1f1f1f;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 0.5rem;
+  color: #fff;
+}
+.modal button {
+  background: var(--gradient-start);
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  margin-top: 10px;
+  margin-right: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s ease;
+}
+
+.modal button:hover {
+  background: var(--gradient-end);
+}
+
+.meal-summary {
+  position: relative;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  background: #333;
+  border-radius: 4px;
+  cursor: default;
+}
+
+.meal-summary-header {
+  color: #fff;
+}
+
+.meal-tooltip {
+  display: none;
+  position: relative;
+  top: 100%;
+  left: 0;
+  background: var(--card-bg);
+  border: 1px solid #444;
+  padding: 0.5rem;
+  border-radius: 6px;
+  box-shadow: var(--card-shadow);
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.meal-summary:hover .meal-tooltip {
+  display: block;
+}
+
+/* Autocomplete dropdown */
+.autocomplete-container {
+  position: relative;
+  flex: 1;
+}
+
+.suggestions-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--card-bg);
+  border: 1px solid #444;
+  max-height: 120px;
+  overflow-y: auto;
+  z-index: 20;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.suggestions-list li {
+  padding: 0.5rem;
+  cursor: pointer;
+  color: var(--text-light);
+}
+.suggestions-list li:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* Modal tweaks */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+.modal {
+  background: var(--card-bg);
+  padding: 2rem;
+  border-radius: var(--card-radius);
+  width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--card-shadow);
+}
+.item-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}

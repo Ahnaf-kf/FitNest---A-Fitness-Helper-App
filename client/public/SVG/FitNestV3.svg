@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 119.83 119.83">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #303030;
+        stroke-width: 0px;
+      }
+    </style>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <g>
+      <g>
+        <rect class="cls-1" width="119.83" height="119.83" rx="18.32" ry="18.32"/>
+        <g>
+          <image width="83" height="21" transform="translate(18.62 14.06)" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFMAAAAVCAYAAAA6s9JxAAAACXBIWXMAAAsSAAALEgHS3X78AAAAUUlEQVRYhe3QQQ3AIADAQMC/kJlCCY/NRBOS5U5B07mf8w4S63bAn5gZMjNkZsjMkJkhM0NmhswMmRkyM2RmyMyQmSEzQ2aGzAyZGTIzZGboA9W6A6n6HrgzAAAAAElFTkSuQmCC"/>
+          <image width="21" height="75" transform="translate(18.62 33.06)" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAABLCAYAAACfk8wRAAAACXBIWXMAAAsSAAALEgHS3X78AAAAOUlEQVRYhe3MMQEAIAgAMKR/EEqRxEMC+HJuAXa67otluR1KpVKpVCqVSqVSqVQqlUqlUqlUKpV+BnCVBBUGAeZVAAAAAElFTkSuQmCC"/>
+          <image width="46" height="21" transform="translate(18.62 47.06)" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAVCAYAAAA5BNxZAAAACXBIWXMAAAsSAAALEgHS3X78AAAAO0lEQVRIie3OQQ0AIAwAsW3+hWBqSniABx5HllwVNHvtEwPV78Ar4zTjNOM04zTjNOM04zTjNOO0sfELVkEDqTotPZoAAAAASUVORK5CYII="/>
+        </g>
+      </g>
+      <g>
+        <image width="17" height="36" transform="translate(42.62 72.06)" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAkCAYAAABv2tHkAAAACXBIWXMAAAsSAAALEgHS3X78AAAAKklEQVRIiWO8u+L3fwYKAROlBowaMmrIqCGjhowaMmrIqCGjhowagg8AAExDA8danM6LAAAAAElFTkSuQmCC"/>
+        <image width="22" height="72" transform="translate(79.62 36.06)" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAABICAYAAADyMAW8AAAACXBIWXMAAAsSAAALEgHS3X78AAAAOUlEQVRYhe3MMQEAIAgAMKR/EEqRxEMq+PBtAXa67osFuZGKxWKxWCwWi8VisVgsFovFYrFYLBb/G6KoBA+VLL1AAAAAAElFTkSuQmCC"/>
+        <image width="22" height="36" transform="translate(58.62 72.06)" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAkCAYAAACNBsqdAAAACXBIWXMAAAsSAAALEgHS3X78AAAArElEQVRIibXTyxHAIAgEUHUmlaSplGhTVuLBnDJj4ocFNpzEw1MRQsm1lVxbIEd6Fmw89QkTT98NFj7ALHwKM2IJe2+9vbEHF0thxaEaW3D487S4qis0uLrdUNzUxwhuHhAJd03eDo/I6VKc1xGn8B/4K2HiwxNY+ACz8CnMwJewF9/CHlyErTgEW3AY1uIqWIOrYRQ3wQhuhiXcBe9wN7zCKfAMp8FfnAr3+A3qK4CUcPKtoQAAAABJRU5ErkJggg=="/>
+      </g>
+    </g>
+  </g>
+</svg>

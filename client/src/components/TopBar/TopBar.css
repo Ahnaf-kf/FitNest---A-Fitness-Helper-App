@@ -1,0 +1,49 @@
+.topbar {
+  height: 60px;
+  background: var(--bg-color);
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.spacer { flex: 1; }
+
+.user-avatar {
+  width: 75%;
+  height: 75%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-circle {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  background: #444;
+  color: var(--text-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.user-dropdown {
+  position: absolute;
+  right: 0; top: 50px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--card-shadow);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dropdown-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  color: var(--text-light);
+}
+.dropdown-item:hover {
+  background: #3a3a3a;
+}

@@ -1,0 +1,209 @@
+/* Base */
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #2c2c2c;
+  color: #fff;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background-color: #2c2c2c;
+  border-right: 1px solid #555;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.logo-section {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.logo-image {
+  max-width: 100%;
+  height: auto;
+}
+.nav-links ul {
+  color: #fff;
+  text-decoration: none;
+  padding: 0;
+}
+.nav-links li {
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+.nav-links li:hover,
+.nav-links .active {
+  color: #fff;
+  text-decoration: none;
+  background-color: #3a3a3a;
+  font-weight: bold;
+}
+.nav-links .active {
+  background-color: #3a3a3a;
+  color: #dda8fb;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Top Bar */
+.top-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  background-color: #2c2c2c;
+  border-bottom: 1px solid #555;
+  height: 60px;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+.user-circle {
+  position: relative;
+  cursor: pointer;
+}
+.circle-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #666;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+.user-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background-color: #3a3a3a;
+  border: 1px solid #555;
+  width: 120px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+.dropdown-item {
+  padding: 10px;
+  border-bottom: 1px solid #555;
+  cursor: pointer;
+}
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+.dropdown-item:hover {
+  background-color: #555;
+}
+
+/* Title */
+.dashboard-title {
+  text-align: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #555;
+}
+
+/* Days Bar */
+.progress-days-bar {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+}
+.day-cell {
+  text-align: center;
+  flex: 1;
+}
+.day-name {
+  font-weight: bold;
+}
+.day-circle {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto;
+}
+.day-date {
+  font-size: 0.85rem;
+  color: #bbb;
+}
+
+/* Content Columns */
+.progress-content {
+  display: flex;
+  padding: 20px;
+  gap: 20px;
+}
+.left-col,
+.right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.left-col {
+  flex: 1;
+}
+.right-col {
+  flex: 1;
+}
+
+/* Boxes */
+.box {
+  background-color: #3a3a3a;
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 15px;
+  box-sizing: border-box;
+}
+.small-circle {
+  width: 65px;
+  height: 65px;
+}
+.box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.box-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+.pct {
+  font-weight: bold;
+}
+
+/* Workout List */
+.workout-list {
+  list-style: none;
+  padding: 10px 0 0 0;
+  margin: 0;
+}
+.workout-list li {
+  margin-bottom: 8px;
+}
+.check {
+  color: #dda8fb;
+  margin-left: 8px;
+}
+
+/* Cardio Details */
+.cardio-details div {
+  margin: 6px 0;
+}
+
+/* Overview */
+.overview-box h2 {
+  margin-bottom: 10px;
+}
+.overview-details div {
+  margin-bottom: 8px;
+}
+.macros div {
+  margin-left: 10px;
+  margin-bottom: 6px;
+}
