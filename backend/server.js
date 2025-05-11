@@ -20,6 +20,7 @@ const profileRoutes = require('./routes/profile/profile');
 const workoutRoutes = require('./routes/workouts/workouts');
 const cardioRoutes = require('./routes/cardio/cardio');
 const dietRoutes = require('./routes/diet/diet');
+const sleepRoutes = require('./routes/sleep/sleep');
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/workouts', workoutRoutes);
 app.use('/api/cardio', cardioRoutes);
 app.use('/api/diet', dietRoutes);
+app.use('/api/sleep', sleepRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -60,6 +62,7 @@ const pages = {
   '/workouts': 'workouts.html',
   '/cardio': 'cardio.html',
   '/logout': 'logout.html',
+  '/sleep': 'sleep.html',
 };
 
 Object.entries(pages).forEach(([route, file]) => {
