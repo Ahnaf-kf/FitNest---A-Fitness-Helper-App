@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Today's Workout</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+<div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <button class="logo-btn" onclick="location.href='/dashboard'"><img src="../assets/logos/fitnest.png" alt="FitNest Logo"></button>
+        <ul>
+            <li onclick="location.href='/dashboard'">Dashboard</li>
+            <!--<li onclick="location.href='/routines'">Routines</li>-->
+            <li onclick="location.href='/workouts'">Workouts</li>
+            <li onclick="location.href='/cardio'">Cardio</li>
+            <li onclick="location.href='/diet_plan'">Diet</li>
+            <li onclick="location.href='/sleep'">Sleep</li>
+            <!--<li onclick="location.href='/settings'">Settings</li>-->
+            <li><a href="/updategoals">Goals</a></li> 
+            <!--<li><a href="/todayworkout" id="todaysWorkoutLink">Today's Workout</a></li>-->
+            <!--<li><a href="/mealplan">Today's Meals</a></li>--> 
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+        <header class="header">
+            <h1>Today's Workout</h1>
+        </header>
+
+        <section class="workout-details">
+            <h3 id="workoutTitle">Workout for Today</h3>
+            <div id="workoutPlan">
+                <!-- Today's workout will be displayed here -->
+            </div>
+
+            <button id="completeWorkoutButton">Mark as Completed</button>
+        </section>
+    </main>
+</div>
+
+<script src="../assets/js/todaysWorkout.js"></script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fitness App Sign In</title>
+  <link rel="stylesheet" href="..\assets\css\styles.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #272727;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .signin-container {
+      background-color: #332f2fee;
+      padding: 40px 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .signin-container h2 {
+      margin-bottom: 25px;
+      color: #a200ff;
+      font-size: 30px;
+      font-weight: bold;
+    }
+    .signin-container input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      background-color: #1f1f1f;
+      color: #fff;
+    }
+    .signin-container input::placeholder {
+      color: #aaa;
+    }
+    .signin-container button {
+      width: 100%;
+      padding: 12px;
+      background-color: #a200ff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .signin-container button:hover {
+      background-color: #8900d3;
+    }
+    .signup-link {
+      margin-top: 20px;
+      color: #ccc;
+      font-size: 14px;
+    }
+    .signup-link a {
+      color: #a200ff;
+      text-decoration: none;
+    }
+    .signup-link a:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 480px) {
+      .signin-container {
+        width: 90%;
+        padding: 30px 20px;
+      }
+      .signin-container h2 {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="signin-container">
+    <h2>Welcome Back</h2>
+    <form id="signin-form">
+      <input type="email" id="email" placeholder="Email Address" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Sign In</button>
+    </form>
+    <div class="signup-link">
+      <p>Don't have an account? <a href="/sign-up">Sign Up</a></p>
+    </div>
+  </div>
+
+  <!-- Link to the external JS file for Sign In -->
+  <script src="..\assets\js\sign-in.js"></script>
+</body>
+</html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitNest - Workouts</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4b085f;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 1rem;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            height: 100%;
+        }
+        
+        .logo-btn {
+            background: transparent;
+            border: none;
+            margin-bottom: 2rem;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .logo-btn img {
+            max-width: 80%;
+            height: auto;
+        }
+        
+        .sidebar ul {
+            list-style: none;
+        }
+        
+        .sidebar li {
+            padding: 0.8rem 1rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .sidebar li:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .sidebar li.active {
+            background-color: rgba(255,255,255,0.2);
+        }
+        
+        /* Main Content Styles */
+        .main {
+            flex: 1;
+            margin-left: 250px;
+            padding: 2rem;
+        }
+        
+        .header {
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            font-weight: 600;
+        }
+        
+        /* Workout Plan Section */
+        .workout-plan {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .workout-plan h3 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .workout-plan p {
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+        }
+        
+        #fitnessLevel {
+            padding: 0.8rem 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            width: 200px;
+            margin-right: 1rem;
+            font-size: 1rem;
+        }
+        
+        #generateWorkout {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        #generateWorkout:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        #workoutDetails {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            min-height: 200px;
+        }
+
+        /* Notes Feature Styles */
+        .day-plan {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .day-notes {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .day-notes textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .day-notes textarea:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(72, 149, 239, 0.2);
+        }
+
+        .day-notes button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .day-notes button:hover {
+            background: #3a7bd5;
+            transform: translateY(-1px);
+        }
+
+        .exercise {
+            position: relative;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .exercise:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .exercise-notes {
+            width: 100%;
+            min-height: 60px;
+            padding: 0.6rem;
+            margin-top: 0.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: 4px;
+            resize: vertical;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .exercise-notes:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(72, 149, 239, 0.2);
+        }
+
+        .save-all-notes {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 1rem;
+            display: block;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .save-all-notes:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .exercise label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            color: #495057;
+        }
+
+        .exercise input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--success);
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification.success {
+            background-color: var(--success);
+        }
+
+        .notification.error {
+            background-color: var(--danger);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+            
+            .main {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <button class="logo-btn" onclick="location.href='/dashboard'">
+            <img src="../assets/logos/fitnest.png" alt="FitNest Logo">
+        </button>
+        <ul>
+            <li onclick="location.href='/dashboard'">🏠 Dashboard</li>
+            <li onclick="location.href='/workouts'" class="active">💪 Workouts</li>
+            <li onclick="location.href='/cardio'">🏃 Cardio</li>
+            <li onclick="location.href='/diet_plan'">🥗 Diet</li>
+            <li onclick="location.href='/updategoals'">🎯 Goals</li>
+            <li onclick="location.href='/sleep'">💤 Sleep</li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+        <header class="header">
+            <h1>Your Workout Plan</h1>
+            <p>Track your workouts and add personal notes for each exercise</p>
+        </header>
+
+        <section class="workout-plan">
+            <h3>Custom Workout Generator</h3>
+            <p>Select your fitness level and we'll create a personalized workout routine for you.</p>
+            
+            <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
+                <select id="fitnessLevel">
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                </select>
+                <button id="generateWorkout">Generate Plan</button>
+            </div>
+
+            <div id="workoutDetails">
+                <p style="color: #6c757d; text-align: center;">Your workout plan will appear here</p>
+            </div>
+
+            <button id="saveAllNotes" class="save-all-notes" style="display: none;">Save All Notes</button>
+        </section>
+    </main>
+</div>
+
+<script>
+document.getElementById('generateWorkout').addEventListener('click', function() {
+    const fitnessLevel = document.getElementById('fitnessLevel').value;
+    const userId = localStorage.getItem('user_id');
+
+    if (!userId) {
+        alert('User not signed in. Please log in.');
+        window.location.href = '/';
+        return;
+    }
+
+    // Fetch workout plan from the API
+    fetch(`/api/workouts`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            user_id: userId,
+            fitness_level: fitnessLevel
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert(data.message);
+        }
+
+        // Display the generated workout plan
+        displayWorkoutPlan(data.workout);
+    })
+    .catch(error => {
+        console.error('Error generating workout:', error);
+        alert('Could not generate workout plan. Please try again later.');
+    });
+});
+
+// Function to display the generated workout plan
+function displayWorkoutPlan(workout) {
+    const workoutDetails = document.getElementById('workoutDetails');
+    workoutDetails.innerHTML = ''; // Clear any previous content
+
+    const workoutPlan = workout.workout_plan;
+    workoutPlan.forEach(day => {
+        const dayDiv = document.createElement('div');
+        dayDiv.classList.add('day-plan');
+        dayDiv.innerHTML = `<h4>${day.day} - ${day.workout_type.toUpperCase()}</h4>`;
+
+        // Add day notes section
+        const dayNotesDiv = document.createElement('div');
+        dayNotesDiv.classList.add('day-notes');
+        dayNotesDiv.innerHTML = `
+            <h5>Day Notes</h5>
+            <textarea placeholder="Add notes about your workout day..." data-day="${day.day}">${day.day_notes || ''}</textarea>
+            <button class="save-day-notes" data-day="${day.day}">Save Notes</button>
+        `;
+        dayDiv.appendChild(dayNotesDiv);
+
+        // Add exercises
+        day.exercises.forEach(exercise => {
+            const exerciseDiv = document.createElement('div');
+            exerciseDiv.classList.add('exercise');
+            exerciseDiv.innerHTML = `
+                <p><strong>${exercise.name}</strong> - ${exercise.sets} sets of ${exercise.reps} reps</p>
+                <textarea class="exercise-notes" 
+                          placeholder="Add notes about this exercise..."
+                          data-day="${day.day}"
+                          data-exercise="${exercise.name}">${exercise.notes || ''}</textarea>
+                <label>
+                    <input type="checkbox" ${exercise.completed ? 'checked' : ''} 
+                           data-day="${day.day}"
+                           data-exercise="${exercise.name}">
+                    Mark as completed
+                </label>
+            `;
+            dayDiv.appendChild(exerciseDiv);
+        });
+
+        workoutDetails.appendChild(dayDiv);
+    });
+
+    // Show the save all button
+    document.getElementById('saveAllNotes').style.display = 'block';
+
+    // Add event listeners for saving notes
+    setupNoteSaving();
+}
+
+function setupNoteSaving() {
+    // Save all notes button
+    document.getElementById('saveAllNotes').addEventListener('click', saveAllNotes);
+
+    // Individual day note save buttons
+    document.querySelectorAll('.save-day-notes').forEach(button => {
+        button.addEventListener('click', function() {
+            const day = this.getAttribute('data-day');
+            saveDayNotes(day);
+        });
+    });
+}
+
+function saveDayNotes(day) {
+    const userId = localStorage.getItem('user_id');
+    const textarea = document.querySelector(`.day-notes textarea[data-day="${day}"]`);
+    const dayNotes = textarea.value;
+
+    // Get all exercise notes for this day
+    const exerciseNotes = {};
+    document.querySelectorAll(`.exercise-notes[data-day="${day}"]`).forEach(textarea => {
+        const exerciseName = textarea.getAttribute('data-exercise');
+        const completed = document.querySelector(`input[data-day="${day}"][data-exercise="${exerciseName}"]`).checked;
+        exerciseNotes[exerciseName] = {
+            notes: textarea.value,
+            completed: completed
+        };
+    });
+
+    saveNotesToServer(userId, day, dayNotes, exerciseNotes);
+}
+
+function saveAllNotes() {
+    const userId = localStorage.getItem('user_id');
+    const workoutDays = Array.from(document.querySelectorAll('.day-plan')).map(dayDiv => {
+        return dayDiv.querySelector('h4').textContent.split(' - ')[0];
+    });
+
+    workoutDays.forEach(day => {
+        saveDayNotes(day);
+    });
+}
+
+function saveNotesToServer(userId, day, dayNotes, exerciseNotes) {
+    fetch(`/api/workouts/update-notes/${userId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            day: day,
+            day_notes: dayNotes,
+            exercise_notes: exerciseNotes,
+            mark_completed: false
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Notes saved successfully!');
+        } else {
+            showNotification('Failed to save notes: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error saving notes:', error);
+        showNotification('Error saving notes. Please try again.', 'error');
+    });
+}
+
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+</script>
+</body>
+</html>
