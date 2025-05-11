@@ -24,18 +24,17 @@ function isSameWeek(d1, d2) {
 // Function to process step data for chart
 function processStepData(dailySteps) {
   const currentDate = new Date();
-  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const result = [0, 0, 0, 0, 0, 0, 0]; // Initialize for each day of week
+  const result = [0, 0, 0, 0, 0, 0, 0]; // Initialize for each day of week (0=Sun, 1=Mon, ..., 6=Sat)
 
   dailySteps.forEach(entry => {
     if (isSameWeek(entry.date, currentDate)) {
-      const dayOfWeek = new Date(entry.date).getDay();
+      const dayOfWeek = new Date(entry.date).getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
       result[dayOfWeek] += entry.steps;
     }
   });
 
-  // Reorder to start with Monday
-  return [...result.slice(1), result[0]];
+  // Reorder to start with Monday (1) and end with Sunday (0)
+  return [result[1], result[2], result[3], result[4], result[5], result[6], result[0]];
 }
 
 // Fetch Profile, Cardio, Diet and Workout Data
@@ -83,27 +82,28 @@ fetch(`/api/profile/${userId}`)
       .then(res => res.json())
       .then(dietData => {
         const currentDate = new Date();
-        const burned = [0, 0, 0, 0, 0, 0, 0];
-        const consumed = [0, 0, 0, 0, 0, 0, 0];
+        const burned = [0, 0, 0, 0, 0, 0, 0]; // 0=Sun, 1=Mon, ..., 6=Sat
+        const consumed = [0, 0, 0, 0, 0, 0, 0]; // 0=Sun, 1=Mon, ..., 6=Sat
 
         if (dietData.calories) {
           dietData.calories.burned.forEach(entry => {
             if (isSameWeek(entry.date, currentDate)) {
-              const day = new Date(entry.date).getDay();
+              const day = new Date(entry.date).getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
               burned[day] += entry.amount;
             }
           });
 
           dietData.calories.consumed.forEach(entry => {
             if (isSameWeek(entry.date, currentDate)) {
-              const day = new Date(entry.date).getDay();
+              const day = new Date(entry.date).getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
               consumed[day] += entry.amount;
             }
           });
         }
 
-        const reorderedBurned = [...burned.slice(1), burned[0]];
-        const reorderedConsumed = [...consumed.slice(1), consumed[0]];
+        // Reorder to start with Monday (1) and end with Sunday (0)
+        const reorderedBurned = [burned[1], burned[2], burned[3], burned[4], burned[5], burned[6], burned[0]];
+        const reorderedConsumed = [consumed[1], consumed[2], consumed[3], consumed[4], consumed[5], consumed[6], consumed[0]];
 
         renderCaloriesCharts(reorderedBurned, reorderedConsumed);
       })

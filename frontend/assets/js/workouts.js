@@ -1,14 +1,61 @@
-document.getElementById('generateWorkout').addEventListener('click', function() {
-    const fitnessLevel = document.getElementById('fitnessLevel').value;
+document.addEventListener('DOMContentLoaded', function() {
     const userId = localStorage.getItem('user_id');
-
+    
     if (!userId) {
         alert('User not signed in. Please log in.');
         window.location.href = '/';
         return;
     }
 
-    // Fetch workout plan from the API
+    // Try to load existing workout plan first
+    fetchWorkoutPlan(userId);
+
+    // Set up event listeners
+    document.getElementById('generateWorkout').addEventListener('click', function() {
+        const fitnessLevel = document.getElementById('fitnessLevel').value;
+        generateWorkoutPlan(userId, fitnessLevel);
+    });
+});
+
+function fetchWorkoutPlan(userId) {
+    fetch(`/api/workouts/${userId}`)
+        .then(response => {
+            if (!response.ok) throw new Error('No workout plan found');
+            return response.json();
+        })
+        .then(data => {
+            if (data.workout) {
+                displayWorkoutPlan(data.workout);
+                // Set the fitness level dropdown to match the current plan
+                const fitnessLevel = determineFitnessLevelFromPlan(data.workout);
+                if (fitnessLevel) {
+                    document.getElementById('fitnessLevel').value = fitnessLevel;
+                }
+            }
+        })
+        .catch(error => {
+            console.log('No existing workout plan found, will generate new one when requested');
+        });
+}
+
+function determineFitnessLevelFromPlan(workout) {
+    // Check the sets and reps to determine fitness level
+    if (!workout.workout_plan || workout.workout_plan.length === 0) return null;
+    
+    const firstExerciseWithSets = workout.workout_plan.find(day => 
+        day.exercises && day.exercises.length > 0
+    )?.exercises[0];
+    
+    if (!firstExerciseWithSets) return null;
+    
+    if (firstExerciseWithSets.sets === 3 && firstExerciseWithSets.reps === 10) return 'beginner';
+    if (firstExerciseWithSets.sets === 4 && firstExerciseWithSets.reps === 12) return 'intermediate';
+    if (firstExerciseWithSets.sets === 5 && firstExerciseWithSets.reps === 15) return 'advanced';
+    
+    return null;
+}
+
+function generateWorkoutPlan(userId, fitnessLevel) {
     fetch(`/api/workouts`, {
         method: 'POST',
         headers: {
@@ -22,17 +69,15 @@ document.getElementById('generateWorkout').addEventListener('click', function() 
     .then(response => response.json())
     .then(data => {
         if (data.message) {
-            alert(data.message);
+            showNotification(data.message);
         }
-
-        // Display the generated workout plan
         displayWorkoutPlan(data.workout);
     })
     .catch(error => {
         console.error('Error generating workout:', error);
-        alert('Could not generate workout plan. Please try again later.');
+        showNotification('Could not generate workout plan. Please try again later.', 'error');
     });
-});
+}
 
 // Function to display the generated workout plan
 function displayWorkoutPlan(workout) {
@@ -138,7 +183,7 @@ function saveNotesToServer(userId, day, dayNotes, exerciseNotes) {
             day: day,
             day_notes: dayNotes,
             exercise_notes: exerciseNotes,
-            mark_completed: false // We'll handle completion separately
+            mark_completed: false
         })
     })
     .then(response => response.json())

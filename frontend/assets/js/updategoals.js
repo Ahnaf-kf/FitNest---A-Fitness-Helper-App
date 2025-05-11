@@ -52,9 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Calculate BMI, BMR, and Maintenance Calories
   function calculateMetrics(weight, height, activityLevel) {
     const heightInMeters = height / 100;  // Convert height from cm to meters
-    const bmi = weight / (heightInMeters * heightInMeters);
-    const bmr = 10 * weight + 6.25 * height - 5 * 25 + 5;  // Example for male (replace with gender-based formula if needed)
-    let maintenanceCalories = bmr * activityLevel;  // Use activity level for BMR multiplier
+    const bmi = Math.round(weight / (heightInMeters * heightInMeters));
+    const bmr = Math.round(10 * weight + 6.25 * height - 5 * 25 + 5);  // Example for male (replace with gender-based formula if needed)
+    let maintenanceCalories = Math.round(bmr * activityLevel);  // Use activity level for BMR multiplier
 
     return { bmi, bmr, maintenanceCalories };
   }

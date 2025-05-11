@@ -28,3 +28,4 @@ document.getElementById("signup-form").addEventListener("submit", async function
     alert('Error occurred while signing up!');
   }
 });
+
