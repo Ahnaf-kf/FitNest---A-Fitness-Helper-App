@@ -4,6 +4,7 @@ function getUserIdFromSession() {
 }
 
 let userId = getUserIdFromSession();
+let userBMR = 2000; // Default BMR if not fetched
 
 if (!userId) {
     alert('User not signed in. Please log in.');
@@ -14,7 +15,9 @@ if (!userId) {
     async function fetchProfile() {
         const response = await fetch(`/api/profile/${userId}`);
         if (!response.ok) return null;
-        return (await response.json()).profile;
+        const profile = (await response.json()).profile;
+        userBMR = profile.metrics?.bmr || 2000; // Update BMR from profile
+        return profile;
     }
 
     async function generateMealPlan() {
@@ -23,13 +26,16 @@ if (!userId) {
         statusDiv.style.color = 'inherit';
     
         try {
+            // Fetch profile to get updated BMR
+            await fetchProfile();
+            
             const foodCategoriesResponse = await fetch(`/api/diet/food-categories/${userId}`);
             const foodCategoriesData = await foodCategoriesResponse.json();
             
             if (!foodCategoriesResponse.ok || !foodCategoriesData.success) {
                 throw new Error(foodCategoriesData.message || 'Failed to fetch food categories');
             }
-    
+
             const response = await fetch(`/api/diet/generate-meal-plan/${userId}`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -45,7 +51,7 @@ if (!userId) {
             if (!response.ok || !data.success) {
                 throw new Error(data.message || 'Failed to generate meal plan');
             }
-    
+
             currentMealPlan = data.mealPlan;
             
             if (!currentMealPlan || !currentMealPlan.breakfast || !currentMealPlan.lunch || !currentMealPlan.dinner) {
@@ -56,27 +62,28 @@ if (!userId) {
             statusDiv.textContent = 'Meal plan generated!';
 
             // Calculate total calories for today
-            const today = new Date().getDay();
+            const todayIndex = new Date().getDay();
+            const today = todayIndex === 0 ? 6 : todayIndex - 1; // Convert to meal plan day index
             const todayMeal = currentMealPlan.breakfast[today] || { totalCalories: 0 };
             const totalCaloriesToday = todayMeal.totalCalories + 
                                      (currentMealPlan.lunch[today]?.totalCalories || 0) + 
                                      (currentMealPlan.dinner[today]?.totalCalories || 0);
-    
+
             const updateResponse = await fetch(`/api/diet/${userId}`, {
                 method: 'PUT',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     calories: {
                         consumed: totalCaloriesToday,
-                        burned: Math.round(totalCaloriesToday * 0.8)
+                        burned: userBMR // Use the user's actual BMR
                     }
                 })
             });
-    
+
             if (!updateResponse.ok) {
                 console.warn('Failed to update calories, but meal plan was generated');
             }
-    
+
             document.getElementById('totalCaloriesToday').textContent = 
                 `Total Calories Consumed Today: ${totalCaloriesToday} kcal`;
         } catch (error) {
@@ -159,31 +166,44 @@ if (!userId) {
         }
     }
 
-    document.getElementById('mealsCompletedToday').addEventListener('click', () => {
-        const today = new Date().getDay();
+    document.getElementById('mealsCompletedToday').addEventListener('click', async () => {
+        // Get current day (0=Sunday to 6=Saturday)
+        const todayIndex = new Date().getDay();
         
         if (!currentMealPlan) {
             alert('Meal plan data is not available.');
             return;
         }
 
-        const breakfast = currentMealPlan.breakfast[today] || { totalCalories: 0 };
-        const lunch = currentMealPlan.lunch[today] || { totalCalories: 0 };
-        const dinner = currentMealPlan.dinner[today] || { totalCalories: 0 };
+        // Convert to meal plan day index (0=Monday to 6=Sunday)
+        let mealPlanDayIndex;
+        if (todayIndex === 0) { // Sunday
+            mealPlanDayIndex = 6;
+        } else {
+            mealPlanDayIndex = todayIndex - 1;
+        }
+
+        const breakfast = currentMealPlan.breakfast[mealPlanDayIndex] || { totalCalories: 0 };
+        const lunch = currentMealPlan.lunch[mealPlanDayIndex] || { totalCalories: 0 };
+        const dinner = currentMealPlan.dinner[mealPlanDayIndex] || { totalCalories: 0 };
         
         const totalCaloriesToday = breakfast.totalCalories + lunch.totalCalories + dinner.totalCalories;
 
-        fetch(`/api/diet/${userId}`, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                calories: {
-                    consumed: totalCaloriesToday,
-                    burned: Math.round(totalCaloriesToday * 0.8)
-                }
-            })
-        })
-        .then(response => {
+        try {
+            // Ensure we have the latest BMR value
+            await fetchProfile();
+            
+            const response = await fetch(`/api/diet/${userId}`, {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    calories: {
+                        consumed: totalCaloriesToday,
+                        burned: userBMR // Use the user's actual BMR
+                    }
+                })
+            });
+
             if (response.ok) {
                 document.getElementById('totalCaloriesToday').textContent = 
                     `Total Calories Consumed Today: ${totalCaloriesToday} kcal`;
@@ -191,11 +211,10 @@ if (!userId) {
             } else {
                 throw new Error('Failed to update calories');
             }
-        })
-        .catch(err => {
+        } catch (err) {
             console.error("Error adding calories:", err);
             alert("An error occurred while updating calories.");
-        });
+        }
     });
 
     // Sticky Note Functions
@@ -361,6 +380,9 @@ if (!userId) {
     // Single DOMContentLoaded event listener
     document.addEventListener('DOMContentLoaded', async () => {
         try {
+            // Load profile to get BMR
+            await fetchProfile();
+            
             // Load meal plan
             const dietResponse = await fetch(`/api/diet/${userId}`);
             if (dietResponse.ok) {

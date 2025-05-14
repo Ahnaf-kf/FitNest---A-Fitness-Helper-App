@@ -130,7 +130,14 @@ router.put('/:user_id', async (req, res) => {
             return res.status(404).json({ message: 'Diet plan not found for this user' });
         }
 
+        // Get user's profile to access BMR
+        const profile = await Profile.findOne({ user_id });
+        if (!profile) {
+            return res.status(404).json({ message: 'Profile not found for this user' });
+        }
+
         const today = new Date().toISOString().split('T')[0];
+        const userBMR = profile.metrics?.bmr || 2000; //default to 2000
 
         if (calories && calories.consumed !== undefined) {
             const existingConsumedEntry = diet.calories.consumed.find(entry => entry.date === today);
@@ -144,16 +151,15 @@ router.put('/:user_id', async (req, res) => {
             }
         }
 
-        if (calories && calories.burned !== undefined) {
-            const existingBurnedEntry = diet.calories.burned.find(entry => entry.date === today);
-            if (existingBurnedEntry) {
-                existingBurnedEntry.amount += calories.burned;
-            } else {
-                diet.calories.burned.push({
-                    date: today,
-                    amount: calories.burned
-                });
-            }
+        // Always set burned calories to user's BMR
+        const existingBurnedEntry = diet.calories.burned.find(entry => entry.date === today);
+        if (existingBurnedEntry) {
+            existingBurnedEntry.amount = userBMR;
+        } else {
+            diet.calories.burned.push({
+                date: today,
+                amount: userBMR
+            });
         }
 
         if (nutrition_notes !== undefined) {
@@ -241,28 +247,40 @@ router.post('/shuffle/:user_id', async (req, res) => {
             return res.status(404).json({ message: 'Diet plan not found for this user' });
         }
 
+        // Create a deep copy of the current meal plan
         let shuffledMealPlan = JSON.parse(JSON.stringify(diet.meal_plans));
 
         if (type === "today") {
-            const todayIndex = new Date().getDay();
+            const todayIndex = new Date().getDay(); // 0 (Sunday) to 6 (Saturday)
+            
+            // Ensure todayIndex is valid (0-6)
             if (todayIndex >= 0 && todayIndex < 7) {
-                const swapIndex = Math.floor(Math.random() * 7);
-                
+                // Find a different random day to swap with (not the same as today)
+                let swapIndex;
+                do {
+                    swapIndex = Math.floor(Math.random() * 7);
+                } while (swapIndex === todayIndex);
+
+                // Swap breakfast
                 [shuffledMealPlan.breakfast[todayIndex], shuffledMealPlan.breakfast[swapIndex]] = 
-                [shuffledMealPlan.breakfast[swapIndex], shuffledMealPlan.breakfast[todayIndex]];
+                    [shuffledMealPlan.breakfast[swapIndex], shuffledMealPlan.breakfast[todayIndex]];
 
+                // Swap lunch
                 [shuffledMealPlan.lunch[todayIndex], shuffledMealPlan.lunch[swapIndex]] = 
-                [shuffledMealPlan.lunch[swapIndex], shuffledMealPlan.lunch[todayIndex]];
+                    [shuffledMealPlan.lunch[swapIndex], shuffledMealPlan.lunch[todayIndex]];
 
+                // Swap dinner
                 [shuffledMealPlan.dinner[todayIndex], shuffledMealPlan.dinner[swapIndex]] = 
-                [shuffledMealPlan.dinner[swapIndex], shuffledMealPlan.dinner[todayIndex]];
+                    [shuffledMealPlan.dinner[swapIndex], shuffledMealPlan.dinner[todayIndex]];
             }
         } else {
-            shuffledMealPlan.breakfast = shuffleArray(diet.meal_plans.breakfast);
-            shuffledMealPlan.lunch = shuffleArray(diet.meal_plans.lunch);
-            shuffledMealPlan.dinner = shuffleArray(diet.meal_plans.dinner);
+            // Shuffle entire week - each meal type independently
+            shuffledMealPlan.breakfast = shuffleArray(shuffledMealPlan.breakfast);
+            shuffledMealPlan.lunch = shuffleArray(shuffledMealPlan.lunch);
+            shuffledMealPlan.dinner = shuffleArray(shuffledMealPlan.dinner);
         }
 
+        // Save the shuffled meal plan
         diet.meal_plans = shuffledMealPlan;
         diet.last_updated = new Date();
         await diet.save();

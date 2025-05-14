@@ -2,7 +2,7 @@ const express = require('express');
 const Workout = require('../../models/workout');
 const router = express.Router();
 
-const generateWorkoutPlan = (fitness_level) => {
+const generateWorkoutPlan = (fitness_level, week_number = 1) => {
   const exercises = {
     push: [
       { name: 'Incline Barbell Bench Press', category: 'compound' },
@@ -30,7 +30,8 @@ const generateWorkoutPlan = (fitness_level) => {
       { name: 'Barbell Curls', category: 'compound' },
       { name: 'Tricep Pushdowns', category: 'accessory' },
       { name: 'Forearm Curls', category: 'accessory' }
-    ]
+    ],
+    rest: []
   };
 
   const setsAndReps = {
@@ -40,32 +41,23 @@ const generateWorkoutPlan = (fitness_level) => {
   };
 
   const workoutPlan = [];
-  const restDays = fitness_level === 'beginner' ? 2 : 1;
+  const baseSequence = ['push', 'pull', 'legs', 'arms', 'rest'];
+  
+  // Calculate starting index based on week number to continue the sequence
+  const startIndex = (week_number - 1) % baseSequence.length;
 
   for (let i = 0; i < 7; i++) {
+    const sequenceIndex = (startIndex + i) % baseSequence.length;
+    const workoutType = baseSequence[sequenceIndex];
+    
     const day = { 
       day: `Day ${i + 1}`, 
-      exercises: [],
+      workout_type: workoutType,
+      exercises: workoutType === 'rest' ? [] : [...exercises[workoutType]],
       completed: false,
       day_notes: '',
       date_completed: null
     };
-
-    if (i % 2 === 0) {
-      day.workout_type = 'push';
-      day.exercises = [...exercises.push];
-    } else if (i % 2 === 1) {
-      day.workout_type = 'pull';
-      day.exercises = [...exercises.pull];
-    }
-
-    if (i === 4) {
-      day.workout_type = 'rest';
-      day.exercises = [];
-    } else if (i === 6) {
-      day.workout_type = 'arms';
-      day.exercises = [...exercises.arms];
-    }
 
     day.exercises.forEach(exercise => {
       exercise.sets = setsAndReps[fitness_level].sets;
@@ -91,12 +83,16 @@ router.post('/', async (req, res) => {
       });
     }
 
-    const workoutPlan = generateWorkoutPlan(fitness_level);
-    const existingWorkout = await Workout.findOne({ user_id });
+    const existingWorkout = await Workout.findOne({ user_id })
+      .sort({ week_number: -1 })
+      .limit(1);
+
+    const week_number = existingWorkout ? existingWorkout.week_number + 1 : 1;
+    const workoutPlan = generateWorkoutPlan(fitness_level, week_number);
 
     if (existingWorkout) {
       existingWorkout.workout_plan = workoutPlan;
-      existingWorkout.week_number += 1;
+      existingWorkout.week_number = week_number;
       existingWorkout.last_updated = Date.now();
       await existingWorkout.save();
       
@@ -109,7 +105,8 @@ router.post('/', async (req, res) => {
 
     const newWorkout = new Workout({ 
       user_id, 
-      workout_plan: workoutPlan 
+      workout_plan: workoutPlan,
+      week_number: 1
     });
     await newWorkout.save();
     
@@ -127,7 +124,6 @@ router.post('/', async (req, res) => {
     });
   }
 });
-
 router.get('/:user_id', async (req, res) => {
   try {
     const { user_id } = req.params;

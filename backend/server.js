@@ -1,8 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
 
-console.log('Mongo URI:', process.env.MONGO_URI);
-
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -75,3 +73,5 @@ const port = process.env.PORT || 5000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
+console.log('Mongo URI:', process.env.MONGO_URI);

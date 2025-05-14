@@ -178,7 +178,7 @@ router.put('/set-goals/:user_id', async (req, res) => {
   }
 });
 
-// Rest of the endpoints remain unchanged
+//timer 
 router.put('/track-timer/:user_id', async (req, res) => {
   const { user_id } = req.params;
   const { cardio_timer } = req.body;
