@@ -72,27 +72,24 @@ async function loadSleepData() {
         const response = await fetch(`/api/sleep/weekly?user_id=${userId}`);
         const data = await response.json();
 
-        // Create a map to store the latest entry for each day
+        // Create a map to store the latest entry for each day using mmdd from backend
         const sleepMap = new Map();
         data.forEach(entry => {
-            const date = new Date(entry.date);
-            date.setHours(0, 0, 0, 0); // Normalize to midnight
-            const dayKey = date.toLocaleDateString('en-US', { weekday: 'short' });
-            sleepMap.set(dayKey, entry.hours);
+            sleepMap.set(entry.mmdd, entry.hours);
         });
 
-        // Get the last 7 days starting from today
+        // Get the last 7 days starting from today (using local time)
         const labels = [];
         const hours = [];
         const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0); // Use local midnight
 
         for (let i = 6; i >= 0; i--) {
             const date = new Date(today);
             date.setDate(date.getDate() - i);
-            const dayKey = date.toLocaleDateString('en-US', { weekday: 'short' });
-            labels.push(dayKey);
-            hours.push(sleepMap.get(dayKey) || 0);
+            const mmdd = `${date.getMonth() + 1}/${date.getDate()}`;
+            labels.push(mmdd);
+            hours.push(sleepMap.get(mmdd) || 0);
         }
 
         sleepChart.data.labels = labels;
@@ -122,7 +119,12 @@ async function loadSleepNotes() {
     try {
         const response = await fetch(`/api/sleep/notes?user_id=${userId}`);
         const data = await response.json();
-        sleepNotes.value = data.notes || '';
+        
+        if (response.ok) {
+            sleepNotes.value = data.notes || '';
+        } else {
+            console.error('Error loading notes:', data);
+        }
     } catch (error) {
         console.error('Error loading sleep notes:', error);
     }
@@ -145,8 +147,11 @@ sleepForm.addEventListener('submit', async (e) => {
         user_id: userId,
         date: document.getElementById('sleepDate').value,
         hours: sleepHours,
-        notes: sleepNotes.value
+        notes: sleepNotes.value || '',
+        quality: 3
     };
+
+    console.log('Submitting sleep data:', formData);
 
     try {
         const response = await fetch('/api/sleep', {
@@ -157,14 +162,16 @@ sleepForm.addEventListener('submit', async (e) => {
             body: JSON.stringify(formData)
         });
 
+        const data = await response.json();
+
         if (response.ok) {
             // Reload data after successful submission
             loadSleepData();
             loadSleepStats();
             sleepForm.reset();
         } else {
-            const error = await response.json();
-            alert(error.message || 'Error logging sleep');
+            console.error('Error response:', data);
+            alert(data.message || 'Error logging sleep');
         }
     } catch (error) {
         console.error('Error submitting sleep data:', error);
@@ -186,10 +193,13 @@ saveNotesBtn.addEventListener('click', async () => {
             })
         });
 
+        const data = await response.json();
+
         if (response.ok) {
             alert('Notes saved successfully');
         } else {
-            alert('Error saving notes');
+            console.error('Error saving notes:', data);
+            alert(data.message || 'Error saving notes');
         }
     } catch (error) {
         console.error('Error saving notes:', error);
