@@ -1,2 +1,2 @@
-# FitMax - A fitness helper app
- Project for CSE471 Lab, Spring 2025
+# FitNest - A fitness helper app
+ Project for CSE470, Spring 2025
