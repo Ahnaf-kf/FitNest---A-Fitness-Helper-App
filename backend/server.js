@@ -19,6 +19,7 @@ const workoutRoutes = require('./routes/workouts/workouts');
 const cardioRoutes = require('./routes/cardio/cardio');
 const dietRoutes = require('./routes/diet/diet');
 const sleepRoutes = require('./routes/sleep/sleep');
+const customMealRoutes = require('./routes/custom_meals/custom_meal');
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use('/api/workouts', workoutRoutes);
 app.use('/api/cardio', cardioRoutes);
 app.use('/api/diet', dietRoutes);
 app.use('/api/sleep', sleepRoutes);
+app.use('/api/custom-meal', customMealRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -55,6 +57,8 @@ const pages = {
   '/profilesetup': 'profilesetup.html',
   '/diet_plan': 'diet_plan.html',
   '/mealplan': 'mealplan.html',
+  '/add_custom_meal.html': 'add_custom_meal.html',
+  '/add_custom_meal': 'add_custom_meal.html',
   '/todayworkout': 'todaysworkout.html',
   '/updategoals': 'updategoals.html',
   '/workouts': 'workouts.html',

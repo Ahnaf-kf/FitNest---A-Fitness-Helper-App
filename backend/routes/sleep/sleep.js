@@ -3,39 +3,62 @@ const router = express.Router();
 const Sleep = require('../../models/sleep');
 const Profile = require('../../models/profile');
 
-// Get sleep data for the last 7 days
+// Helper function to deduplicate entries by day (local time)
+function deduplicateByDay(entries) {
+    const map = new Map();
+    for (const entry of entries) {
+        const date = new Date(entry.date);
+        date.setHours(0, 0, 0, 0);
+        const key = date.toISOString().split('T')[0];
+        // Always keep the latest entry for the day
+        if (!map.has(key) || new Date(entry.date) > new Date(map.get(key).date)) {
+            map.set(key, entry);
+        }
+    }
+    return Array.from(map.values());
+}
+
 router.get('/weekly', async (req, res) => {
     try {
         const user_id = req.query.user_id;
+        //console.log('User ID:', user_id);
         if (!user_id) {
             return res.status(401).json({ message: 'User ID is required' });
         }
 
-        // Get today's date at midnight
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-
-        // Get date 7 days ago at midnight
         const sevenDaysAgo = new Date(today);
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6); // -6 to include today
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
 
-        console.log('Date range:', { sevenDaysAgo, today }); // Debug log
+        //console.log('Date range:', { sevenDaysAgo, today });
 
         const sleepData = await Sleep.find({
-            user_id: user_id,
+            userId: user_id,
             date: {
                 $gte: sevenDaysAgo,
                 $lte: today
             }
         }).sort({ date: 1 });
 
-        // Debug log
-        console.log('Found sleep entries:', sleepData.map(entry => ({
-            date: entry.date,
-            hours: entry.hours
-        })));
+        const uniqueSleepData = deduplicateByDay(sleepData).map(entry => {
+            const date = new Date(entry.date);
+            date.setHours(0, 0, 0, 0);
+            // Format as MM/DD
+            const mmdd = `${date.getMonth() + 1}/${date.getDate()}`;
+            return {
+                ...entry.toObject(),
+                mmdd,
+                ymd: date.toISOString().split('T')[0]
+            };
+        });
 
-        res.json(sleepData);
+        // console.log('Found sleep entries:', uniqueSleepData.map(entry => ({
+        //     date: entry.date,
+        //     hours: entry.hours
+        // })));
+
+        res.json(uniqueSleepData);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching sleep data', error: error.message });
     }
@@ -46,43 +69,53 @@ router.post('/', async (req, res) => {
     try {
         const { user_id, date, hours, notes, quality } = req.body;
         
+        //console.log('Received sleep entry request:', { user_id, date, hours, notes, quality });
+        
         if (!user_id) {
             return res.status(401).json({ message: 'User ID is required' });
         }
 
-        // Normalize the date to midnight
-        const normalizedDate = new Date(date);
-        normalizedDate.setHours(0, 0, 0, 0);
-
-        // Check if entry already exists for this date
-        const existingEntry = await Sleep.findOne({
-            user_id: user_id,
-            date: {
-                $gte: normalizedDate,
-                $lt: new Date(normalizedDate.getTime() + 24 * 60 * 60 * 1000)
-            }
-        });
-
-        if (existingEntry) {
-            return res.status(400).json({ message: 'Sleep entry already exists for this date' });
+        if (!date || !hours) {
+            return res.status(400).json({ message: 'Date and hours are required' });
         }
 
-        const sleepEntry = new Sleep({
-            user_id: user_id,
-            date: normalizedDate,
-            hours,
-            notes,
-            quality
-        });
+        // Normalize the date to local midnight
+        const startOfDay = new Date(date);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(startOfDay);
+        endOfDay.setDate(endOfDay.getDate() + 1);
 
-        await sleepEntry.save();
+        //console.log('Normalized date:', startOfDay);
+
+        // Find and update or create new entry for the day (ignore time)
+        const sleepEntry = await Sleep.findOneAndUpdate(
+            { 
+                userId: user_id,
+                date: { $gte: startOfDay, $lt: endOfDay }
+            },
+            { 
+                userId: user_id,
+                date: startOfDay,
+                hours: Number(hours),
+                notes: notes || '',
+                quality: quality || 3
+            },
+            { 
+                new: true, 
+                upsert: true,
+                setDefaultsOnInsert: true
+            }
+        );
+
+        //console.log('Created/Updated sleep entry:', sleepEntry);
         res.status(201).json(sleepEntry);
     } catch (error) {
-        if (error.code === 11000) {
-            res.status(400).json({ message: 'Sleep entry already exists for this date' });
-        } else {
-            res.status(500).json({ message: 'Error adding sleep entry', error: error.message });
-        }
+        console.error('Error in sleep entry:', error);
+        res.status(500).json({ 
+            message: 'Error adding sleep entry', 
+            error: error.message,
+            details: error.stack 
+        });
     }
 });
 
@@ -96,13 +129,15 @@ router.post('/notes', async (req, res) => {
         }
 
         // Find the most recent sleep entry for this user
-        const latestSleep = await Sleep.findOne({ user_id: user_id })
+        const latestSleep = await Sleep.findOne({ userId: user_id })
             .sort({ date: -1 });
+
+        //console.log('Latest sleep:', latestSleep);
 
         if (!latestSleep) {
             // If no sleep entry exists, create a new one with today's date
             const newSleep = new Sleep({
-                user_id: user_id,
+                userId: user_id,
                 date: new Date(),
                 hours: 0,
                 notes,
@@ -118,6 +153,7 @@ router.post('/notes', async (req, res) => {
         
         res.json(latestSleep);
     } catch (error) {
+        console.error('Error saving sleep notes:', error);
         res.status(500).json({ message: 'Error saving sleep notes', error: error.message });
     }
 });
@@ -130,63 +166,16 @@ router.get('/notes', async (req, res) => {
             return res.status(401).json({ message: 'User ID is required' });
         }
 
-        const latestSleep = await Sleep.findOne({ user_id: user_id })
+        const latestSleep = await Sleep.findOne({ userId: user_id })
             .sort({ date: -1 });
 
         res.json({ notes: latestSleep?.notes || '' });
     } catch (error) {
+        console.error('Error fetching sleep notes:', error);
         res.status(500).json({ message: 'Error fetching sleep notes', error: error.message });
     }
 });
 
-// Update sleep entry
-router.put('/:id', async (req, res) => {
-    try {
-        const { user_id, hours, notes, quality } = req.body;
-        
-        if (!user_id) {
-            return res.status(401).json({ message: 'User ID is required' });
-        }
-
-        const sleepEntry = await Sleep.findOneAndUpdate(
-            { _id: req.params.id, user_id: user_id },
-            { hours, notes, quality },
-            { new: true }
-        );
-
-        if (!sleepEntry) {
-            return res.status(404).json({ message: 'Sleep entry not found' });
-        }
-
-        res.json(sleepEntry);
-    } catch (error) {
-        res.status(500).json({ message: 'Error updating sleep entry', error: error.message });
-    }
-});
-
-// Delete sleep entry
-router.delete('/:id', async (req, res) => {
-    try {
-        const { user_id } = req.query;
-        
-        if (!user_id) {
-            return res.status(401).json({ message: 'User ID is required' });
-        }
-
-        const sleepEntry = await Sleep.findOneAndDelete({
-            _id: req.params.id,
-            user_id: user_id
-        });
-
-        if (!sleepEntry) {
-            return res.status(404).json({ message: 'Sleep entry not found' });
-        }
-
-        res.json({ message: 'Sleep entry deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error deleting sleep entry', error: error.message });
-    }
-});
 
 // Get sleep statistics
 router.get('/stats', async (req, res) => {
@@ -196,28 +185,42 @@ router.get('/stats', async (req, res) => {
             return res.status(401).json({ message: 'User ID is required' });
         }
 
+        // Get date 30 days ago at local midnight
         const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setHours(0, 0, 0, 0);
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
+        // console.log('Date range:', { thirtyDaysAgo });
+
         const sleepData = await Sleep.find({
-            user_id: user_id,
+            userId: user_id,
             date: { $gte: thirtyDaysAgo }
-        });
+        }).sort({ date: 1 });
+
+        const uniqueSleepData = deduplicateByDay(sleepData);
+        //console.log('Found sleep entries:', uniqueSleepData.length);
 
         // Get user's sleep goal from profile
         const profile = await Profile.findOne({ user_id: user_id });
-        const sleepGoal = profile?.metrics?.sleep_hours || 8; // Default to 8 hours if not set
+        const sleepGoal = profile?.metrics?.sleep_hours ?? 8;
 
-        const avgSleep = sleepData.reduce((acc, curr) => acc + curr.hours, 0) / sleepData.length || 0;
-        const sleepStreak = calculateSleepStreak(sleepData);
+        // Calculate average sleep only if there are entries
+        const avgSleep = uniqueSleepData.length > 0 
+            ? uniqueSleepData.reduce((acc, curr) => acc + curr.hours, 0) / uniqueSleepData.length 
+            : 0;
+
+        const sleepStreak = calculateSleepStreak(uniqueSleepData);
+
+        //console.log('Calculated stats:', { avgSleep, sleepStreak, totalEntries: uniqueSleepData.length });
 
         res.json({
             averageSleep: avgSleep,
             sleepStreak,
-            totalEntries: sleepData.length,
+            totalEntries: uniqueSleepData.length,
             sleepGoal
         });
     } catch (error) {
+        console.error('Error fetching sleep statistics:', error);
         res.status(500).json({ message: 'Error fetching sleep statistics', error: error.message });
     }
 });
@@ -226,20 +229,36 @@ router.get('/stats', async (req, res) => {
 function calculateSleepStreak(sleepData) {
     if (!sleepData.length) return 0;
 
+    const uniqueSleepData = deduplicateByDay(sleepData);
+    const dates = uniqueSleepData.map(entry => {
+        const date = new Date(entry.date);
+        date.setHours(0, 0, 0, 0);
+        return date;
+    }).sort((a, b) => a - b);
+
+    if (dates.length === 0) return 0;
+
+    // Get today's date at local midnight
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    let streak = 0;
-    let currentDate = today;
+    // Check if we have an entry for today
+    const hasToday = dates.some(date => 
+        date.getTime() === today.getTime()
+    );
+
+    if (!hasToday) return 0;
+
+    let streak = 1;
+    let currentDate = new Date(today);
+    currentDate.setDate(currentDate.getDate() - 1);
 
     while (true) {
-        const entry = sleepData.find(entry => {
-            const entryDate = new Date(entry.date);
-            entryDate.setHours(0, 0, 0, 0);
-            return entryDate.getTime() === currentDate.getTime();
-        });
+        const hasEntry = dates.some(date => 
+            date.getTime() === currentDate.getTime()
+        );
 
-        if (!entry) break;
+        if (!hasEntry) break;
 
         streak++;
         currentDate.setDate(currentDate.getDate() - 1);
