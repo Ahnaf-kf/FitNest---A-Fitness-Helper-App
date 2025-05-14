@@ -15,10 +15,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const fitnessLevel = document.getElementById('fitnessLevel').value;
         generateWorkoutPlan(userId, fitnessLevel);
     });
+
+    // Add week navigation buttons
+    document.getElementById('prevWeek').addEventListener('click', () => navigateWeek(userId, -1));
+    document.getElementById('nextWeek').addEventListener('click', () => navigateWeek(userId, 1));
 });
 
-function fetchWorkoutPlan(userId) {
-    fetch(`/api/workouts/${userId}`)
+function fetchWorkoutPlan(userId, week_number) {
+    let url = `/api/workouts/${userId}`;
+    if (week_number) {
+        url += `?week_number=${week_number}`;
+    }
+
+    fetch(url)
         .then(response => {
             if (!response.ok) throw new Error('No workout plan found');
             return response.json();
@@ -31,6 +40,8 @@ function fetchWorkoutPlan(userId) {
                 if (fitnessLevel) {
                     document.getElementById('fitnessLevel').value = fitnessLevel;
                 }
+                // Update week display
+                document.getElementById('currentWeek').textContent = `Week ${data.workout.week_number}`;
             }
         })
         .catch(error => {
@@ -38,8 +49,17 @@ function fetchWorkoutPlan(userId) {
         });
 }
 
+function navigateWeek(userId, direction) {
+    const currentWeekElement = document.getElementById('currentWeek');
+    let currentWeek = parseInt(currentWeekElement.textContent.replace('Week ', '')) || 1;
+    const newWeek = currentWeek + direction;
+    
+    if (newWeek < 1) return; // Don't go below week 1
+    
+    fetchWorkoutPlan(userId, newWeek);
+}
+
 function determineFitnessLevelFromPlan(workout) {
-    // Check the sets and reps to determine fitness level
     if (!workout.workout_plan || workout.workout_plan.length === 0) return null;
     
     const firstExerciseWithSets = workout.workout_plan.find(day => 
@@ -68,10 +88,13 @@ function generateWorkoutPlan(userId, fitnessLevel) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.message) {
+        if (data.success) {
             showNotification(data.message);
+            displayWorkoutPlan(data.workout);
+            document.getElementById('currentWeek').textContent = `Week ${data.workout.week_number}`;
+        } else {
+            showNotification(data.message || 'Error generating workout', 'error');
         }
-        displayWorkoutPlan(data.workout);
     })
     .catch(error => {
         console.error('Error generating workout:', error);
@@ -79,7 +102,6 @@ function generateWorkoutPlan(userId, fitnessLevel) {
     });
 }
 
-// Function to display the generated workout plan
 function displayWorkoutPlan(workout) {
     const workoutDetails = document.getElementById('workoutDetails');
     workoutDetails.innerHTML = ''; // Clear any previous content
@@ -131,10 +153,7 @@ function displayWorkoutPlan(workout) {
 }
 
 function setupNoteSaving() {
-    // Save all notes button
     document.getElementById('saveAllNotes').addEventListener('click', saveAllNotes);
-
-    // Individual day note save buttons
     document.querySelectorAll('.save-day-notes').forEach(button => {
         button.addEventListener('click', function() {
             const day = this.getAttribute('data-day');
@@ -148,7 +167,6 @@ function saveDayNotes(day) {
     const textarea = document.querySelector(`.day-notes textarea[data-day="${day}"]`);
     const dayNotes = textarea.value;
 
-    // Get all exercise notes for this day
     const exerciseNotes = {};
     document.querySelectorAll(`.exercise-notes[data-day="${day}"]`).forEach(textarea => {
         const exerciseName = textarea.getAttribute('data-exercise');
