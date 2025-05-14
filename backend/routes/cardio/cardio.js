@@ -28,6 +28,15 @@ function isSameWeek(d1, d2) {
   return sunday1.getTime() === sunday2.getTime();
 }
 
+// Helper function to check if dates are the same day
+function isSameDay(d1, d2) {
+  return (
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate()
+  );
+}
+
 // Helper function to create new cardio document with all required fields
 function createNewCardioDocument(user_id, initialData = {}) {
   return new Cardio({
@@ -38,13 +47,18 @@ function createNewCardioDocument(user_id, initialData = {}) {
       type_of_activity: initialData.type_of_activity || 'walking',
       weekly_goal: initialData.weekly_goal || 70000,
       current_week_steps: initialData.current_week_steps || 0,
-      last_week_reset: initialData.last_week_reset || new Date()
+      last_week_reset: initialData.last_week_reset || new Date(),
+      daily_miles_progress: 0,
+      last_daily_reset: new Date()
     },
     cardio_timer: initialData.cardio_timer || 0,
     heart_points: initialData.heart_points || 0,
     weekly_rewards: {
       streak_count: initialData.streak_count || 0,
       last_reward_claimed: initialData.last_reward_claimed || null
+    },
+    daily_rewards: {
+      last_daily_claimed: null
     },
     date_created: new Date(),
     last_updated: new Date()
@@ -69,12 +83,19 @@ router.put('/track-steps/:user_id', async (req, res) => {
       cardio.cardio_goals.last_week_reset = new Date();
     }
 
+    // Reset daily miles progress if new day
+    if (!cardio.cardio_goals.last_daily_reset || 
+        !isSameDay(new Date(), cardio.cardio_goals.last_daily_reset)) {
+      cardio.cardio_goals.daily_miles_progress = 0;
+      cardio.cardio_goals.last_daily_reset = new Date();
+    }
+
     // Convert input to proper format with type safety
     let stepsToAdd = 0;
     if (typeof daily_steps === 'number') {
       stepsToAdd = Number(daily_steps) || 0;
     } else if (Array.isArray(daily_steps)) {
-      stepsToAdd = daily_steps.reduce((sum, step) => sum + (Number(step) || 0, 0));
+      stepsToAdd = daily_steps.reduce((sum, step) => sum + (Number(step) || 0), 0);
     } else if (daily_steps && typeof daily_steps === 'object' && 'steps' in daily_steps) {
       stepsToAdd = Number(daily_steps.steps) || 0;
     }
@@ -87,11 +108,15 @@ router.put('/track-steps/:user_id', async (req, res) => {
     
     // Ensure numeric addition
     cardio.cardio_goals.current_week_steps = Number(cardio.cardio_goals.current_week_steps || 0) + stepsToAdd;
+    
+    // Update daily miles progress (2000 steps ≈ 1 mile)
+    const milesProgress = stepsToAdd / 2000;
+    cardio.cardio_goals.daily_miles_progress = Number(cardio.cardio_goals.daily_miles_progress || 0) + milesProgress;
+    
     cardio.last_updated = new Date();
 
     await cardio.save();
 
-    
     const Diet = require('../../models/diet');
     const caloriesBurned = stepsToAdd * 0.04;
     const today = new Date().toISOString().split('T')[0];
@@ -127,6 +152,7 @@ router.put('/track-steps/:user_id', async (req, res) => {
     });
   }
 });
+
 // Updated set-goals endpoint with better validation
 router.put('/set-goals/:user_id', async (req, res) => {
   const { user_id } = req.params;
@@ -241,7 +267,7 @@ router.get('/weekly-progress/:user_id', async (req, res) => {
   }
 });
 
-router.post('/claim-reward/:user_id', async (req, res) => {
+router.get('/daily-progress/:user_id', async (req, res) => {
   try {
     let cardio = await Cardio.findOne({ user_id: req.params.user_id });
     if (!cardio) {
@@ -249,26 +275,84 @@ router.post('/claim-reward/:user_id', async (req, res) => {
       await cardio.save();
     }
 
-    if (cardio.cardio_goals.current_week_steps < (cardio.cardio_goals.weekly_goal || 70000)) {
-      return res.status(400).json({ message: 'Weekly goal not reached' });
+    // Reset daily progress if it's a new day
+    if (!cardio.cardio_goals.last_daily_reset || 
+        !isSameDay(new Date(), cardio.cardio_goals.last_daily_reset)) {
+      cardio.cardio_goals.daily_miles_progress = 0;
+      cardio.cardio_goals.last_daily_reset = new Date();
+      await cardio.save();
     }
 
-    const lastClaimed = cardio.weekly_rewards.last_reward_claimed;
-    if (lastClaimed && isSameWeek(new Date(), lastClaimed)) {
-      return res.status(400).json({ message: 'Reward already claimed this week' });
+    const progress = {
+      currentMiles: cardio.cardio_goals.daily_miles_progress,
+      goalMiles: cardio.cardio_goals.goal_miles || 3,
+      progressPercent: Math.min(
+        (cardio.cardio_goals.daily_miles_progress / (cardio.cardio_goals.goal_miles || 3)) * 100,
+        100
+      )
+    };
+
+    res.status(200).json(progress);
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching daily progress', error: err });
+  }
+});
+
+router.post('/claim-reward/:user_id', async (req, res) => {
+  try {
+    const { rewardType } = req.body; // 'daily' or 'weekly'
+    let cardio = await Cardio.findOne({ user_id: req.params.user_id });
+    if (!cardio) {
+      cardio = createNewCardioDocument(req.params.user_id);
+      await cardio.save();
     }
 
-    cardio.weekly_rewards.streak_count = (cardio.weekly_rewards.streak_count || 0) + 1;
-    cardio.weekly_rewards.last_reward_claimed = new Date();
-    cardio.heart_points = (cardio.heart_points || 0) + 10;
+    let message = '';
+    let heartPointsEarned = 0;
+
+    if (rewardType === 'weekly') {
+      if (cardio.cardio_goals.current_week_steps < (cardio.cardio_goals.weekly_goal || 70000)) {
+        return res.status(400).json({ message: 'Weekly goal not reached' });
+      }
+
+      const lastClaimed = cardio.weekly_rewards.last_reward_claimed;
+      if (lastClaimed && isSameWeek(new Date(), lastClaimed)) {
+        return res.status(400).json({ message: 'Weekly reward already claimed this week' });
+      }
+
+      cardio.weekly_rewards.streak_count = (cardio.weekly_rewards.streak_count || 0) + 1;
+      cardio.weekly_rewards.last_reward_claimed = new Date();
+      heartPointsEarned = 25;
+      message = 'Weekly reward claimed!';
+    } 
+    else if (rewardType === 'daily') {
+      if (cardio.cardio_goals.daily_miles_progress < (cardio.cardio_goals.goal_miles || 3)) {
+        return res.status(400).json({ message: 'Daily miles goal not reached' });
+      }
+
+      const lastClaimed = cardio.daily_rewards.last_daily_claimed;
+      if (lastClaimed && isSameDay(new Date(), lastClaimed)) {
+        return res.status(400).json({ message: 'Daily reward already claimed today' });
+      }
+
+      cardio.daily_rewards.last_daily_claimed = new Date();
+      heartPointsEarned = 5;
+      message = 'Daily reward claimed!';
+    } 
+    else {
+      return res.status(400).json({ message: 'Invalid reward type' });
+    }
+
+    cardio.heart_points = (cardio.heart_points || 0) + heartPointsEarned;
     cardio.last_updated = new Date();
     
     await cardio.save();
 
     res.status(200).json({ 
-      message: 'Reward claimed!', 
+      message,
       streak: cardio.weekly_rewards.streak_count,
-      heartPoints: cardio.heart_points 
+      heartPoints: cardio.heart_points,
+      heartPointsEarned
     });
   } catch (err) {
     res.status(500).json({ message: 'Error claiming reward', error: err });

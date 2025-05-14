@@ -18,6 +18,7 @@ function isSameDay(d1, d2) {
 
 function updateAllDisplays(userId) {
     updateWeeklyProgress(userId);
+    updateDailyMilesProgress(userId);
     updateHeartPointsDisplay(userId);
 }
 
@@ -46,6 +47,29 @@ function updateWeeklyProgress(userId) {
       });
 }
 
+function updateDailyMilesProgress(userId) {
+    axios.get(`/api/cardio/daily-progress/${userId}`)
+      .then(response => {
+        const progress = response.data;
+        document.getElementById('dailyMilesProgressFill').style.width = `${progress.progressPercent}%`;
+        document.getElementById('currentMiles').textContent = progress.currentMiles.toFixed(2);
+        document.getElementById('goalMiles').textContent = progress.goalMiles;
+        
+        const claimDailyBtn = document.getElementById('claimDailyRewardBtn');
+        claimDailyBtn.disabled = progress.progressPercent < 100;
+        
+        if (progress.progressPercent >= 100) {
+          document.getElementById('dailyMilesProgressFill').style.backgroundColor = 'var(--success)';
+          claimDailyBtn.classList.add('btn-success');
+        } else {
+          document.getElementById('dailyMilesProgressFill').style.backgroundColor = 'var(--accent)';
+          claimDailyBtn.classList.remove('btn-success');
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching daily miles progress', error);
+      });
+}
 function updateHeartPointsDisplay(userId) {
     axios.get(`/api/cardio/${userId}`)
       .then(response => {
@@ -80,12 +104,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initialize heart points
         document.getElementById('heartPoints').textContent = cardio.heart_points || 0;
         
-        // Then update weekly progress
+        // Then update progress displays
         updateWeeklyProgress(userId);
+        updateDailyMilesProgress(userId);
       })
       .catch(error => {
         console.error('Error initializing data:', error);
         updateWeeklyProgress(userId);
+        updateDailyMilesProgress(userId);
       });
 
     // Set Goal Functionality
@@ -98,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(() => {
                 alert('Goal set successfully!');
-                updateAllDisplays(userId); // Update all displays after setting goal
+                updateAllDisplays(userId);
             })
             .catch(error => {
                 console.error('Error setting goal:', error);
@@ -143,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(() => {
                 console.log('Steps saved');
-                updateAllDisplays(userId); // Update all displays after saving steps
+                updateAllDisplays(userId);
             })
             .catch(error => {
                 console.error('Error saving steps:', error);
@@ -155,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     cardio_timer: Math.floor(totalTime / 60)
                 })
                 .then(() => {
-                    updateAllDisplays(userId); // Update all displays after saving time
+                    updateAllDisplays(userId);
                 })
                 .catch(error => {
                     console.error('Error updating timer:', error);
@@ -186,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(() => {
                 alert('Progress saved successfully!');
-                updateAllDisplays(userId); // Update all displays after saving
+                updateAllDisplays(userId);
             })
             .catch(error => {
                 console.error('Error saving progress:', error);
@@ -209,12 +235,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Claim reward
+    // Claim weekly reward
     document.getElementById('claimRewardBtn').addEventListener('click', function() {
-        axios.post(`/api/cardio/claim-reward/${userId}`)
+        axios.post(`/api/cardio/claim-reward/${userId}`, { rewardType: 'weekly' })
           .then(response => {
-            alert(`Reward claimed! Current streak: ${response.data.streak} weeks`);
-            updateAllDisplays(userId); // Update all displays after claiming reward
+            alert(`Weekly reward claimed! You earned ${response.data.heartPointsEarned} heart points. Current streak: ${response.data.streak} weeks`);
+            updateAllDisplays(userId);
           })
           .catch(error => {
             if (error.response && error.response.status === 400) {
@@ -222,6 +248,23 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
               console.error('Error claiming reward:', error);
               alert('Error claiming reward. Please try again.');
+            }
+          });
+    });
+
+    // Claim daily reward
+    document.getElementById('claimDailyRewardBtn').addEventListener('click', function() {
+        axios.post(`/api/cardio/claim-reward/${userId}`, { rewardType: 'daily' })
+          .then(response => {
+            alert(`Daily reward claimed! You earned ${response.data.heartPointsEarned} heart points.`);
+            updateAllDisplays(userId);
+          })
+          .catch(error => {
+            if (error.response && error.response.status === 400) {
+              alert(error.response.data.message);
+            } else {
+              console.error('Error claiming daily reward:', error);
+              alert('Error claiming daily reward. Please try again.');
             }
           });
     });

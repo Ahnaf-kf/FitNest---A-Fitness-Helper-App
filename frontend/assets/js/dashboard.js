@@ -37,13 +37,61 @@ function processStepData(dailySteps) {
   return [result[1], result[2], result[3], result[4], result[5], result[6], result[0]];
 }
 
+//function to calculate total calories burnt
+async function getTotalCaloriesBurnt(userId) {
+    try {
+        const response = await fetch(`/api/diet/${userId}`);
+        const data = await response.json();
+        if (data.calories && data.calories.burned) {
+            return data.calories.burned.reduce((total, entry) => total + (entry.amount || 0), 0);
+        }
+        return 0;
+    } catch (err) {
+        console.error("Error fetching calories data:", err);
+        return 0;
+    }
+}
+
+//function to calculate total steps
+async function getTotalSteps(userId) {
+    try {
+        const response = await fetch(`/api/cardio/${userId}`);
+        const data = await response.json();
+        if (data.cardio && data.cardio.daily_steps) {
+            return data.cardio.daily_steps.reduce((total, entry) => total + (entry.steps || 0), 0);
+        }
+        return 0;
+    } catch (err) {
+        console.error("Error fetching steps data:", err);
+        return 0;
+    }
+}
+
+
+//function to get heart points
+async function getHeartPoints(userId) {
+    try {
+        const response = await fetch(`/api/cardio/${userId}`);
+        const data = await response.json();
+        return data.cardio?.heart_points || 0;
+    } catch (err) {
+        console.error("Error fetching heart points:", err);
+        return 0;
+    }
+}
+
+
 // Fetch Profile, Cardio, Diet and Workout Data
 fetch(`/api/profile/${userId}`)
   .then(res => res.json())
   .then(data => {
+    //const profile = data.profile;
     const metrics = data.profile.metrics;
     const goals = data.profile.fitness_goals;
-    const progress = data.profile.progress;
+    //const progress = data.profile.progress;
+
+    //document.getElementById('userName').textContent = profile.name || 'User';
+
 
     // Display profile information
     document.getElementById('weight').textContent = `Weight: ${metrics.weight}kg`;
@@ -55,9 +103,15 @@ fetch(`/api/profile/${userId}`)
     document.getElementById('goal').textContent = `Goal: ${goals.goal}`;
     document.getElementById('level').textContent = `Fitness Level: ${goals.fitness_level}`;
 
-    document.getElementById('workouts').textContent = `Workouts: ${progress.workouts_completed}`;
-    document.getElementById('cardio').textContent = `Cardio: ${progress.cardio_goals_completed}`;
-    document.getElementById('calories').textContent = `Calories Burned: ${progress.calories_burned}`;
+    Promise.all([
+        getTotalCaloriesBurnt(userId),
+        getTotalSteps(userId),
+        getHeartPoints(userId)
+    ]).then(([caloriesBurnt, totalSteps, heartPoints]) => {
+        document.getElementById('totalCaloriesBurnt').textContent = `Calories Burnt: ${Math.round(caloriesBurnt)}`;
+        document.getElementById('totalStepsCompleted').textContent = `Steps Completed: ${totalSteps}`;
+        document.getElementById('heartPoints').textContent = `Heart Points: ${heartPoints}`;
+    });
 
     // Fetch Cardio Data (Daily Steps)
     fetch(`/api/cardio/${userId}`)
@@ -173,21 +227,3 @@ function renderStepChart(steps) {
     }
   });
 }
-
-// Fetch and update the Today's Workout button status
-fetch(`/api/profile/${userId}`)
-  .then(res => res.json())
-  .then(data => {
-    const dailySummary = data.profile.daily_summary;
-    const today = new Date().toISOString().split('T')[0];
-    const todaySummary = dailySummary.find(summary => summary.date === today);
-
-    const todaysWorkoutLink = document.getElementById("todaysWorkoutLink");
-    if (todaySummary && todaySummary.workout_completed) {
-      todaysWorkoutLink.textContent = "Today's Workout - Completed";
-      todaysWorkoutLink.style.color = "green";
-    }
-  })
-  .catch(err => {
-    console.error("Error fetching profile data:", err);
-  });

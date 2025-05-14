@@ -219,7 +219,33 @@
             transform: none;
             background: #cccccc;
         }
+        
+        #dailyMilesProgressFill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
 
+        #dailyMilesStats {
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        #dailyMilesStats span {
+            font-weight: 600;
+        }
+
+        #claimDailyRewardBtn[disabled] {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+
+        #claimDailyRewardBtn[disabled]:hover {
+            transform: none;
+            background: #cccccc;
+        }
         /* Map Styles */
         #routeMap {
             width: 100%;
@@ -315,6 +341,21 @@
             </div>
         </section>
 
+        <!-- Daily Miles Goal -->
+        <section class="cardio-section">
+            <h2>Daily Miles Goal</h2>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div id="dailyMilesProgressFill"></div>
+                </div>
+                <div id="dailyMilesStats">
+                    <span id="currentMiles">0</span>/<span id="goalMiles">3</span> miles today
+                </div>
+                <button id="claimDailyRewardBtn" class="btn" disabled>Claim Daily Reward</button>
+            </div>
+        </section>
+
+        <!-- Weekly Step Challenge -->
         <section class="cardio-section">
             <h2>Weekly Step Challenge</h2>
             <div class="progress-container">

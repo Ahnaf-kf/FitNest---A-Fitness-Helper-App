@@ -106,6 +106,10 @@
         .user-menu {
             position: relative;
         }
+        #userName {
+            font-weight: 500;
+            color: var(--primary);
+        }
         
         #userIcon {
             background: var(--primary);
@@ -230,6 +234,7 @@
         <header class="header">
             <h1>FitNest Dashboard</h1>
             <div class="user-menu">
+                <!-- <span id="userName" style="margin-right: 1rem;"></span> -->
                 <button id="userIcon"><i class="fas fa-user"></i></button>
                 <div class="dropdown" id="userDropdown">
                     <!-- <a href="profile.html">Profile</a>
@@ -254,7 +259,7 @@
                 <canvas id="stepChart"></canvas>
             </div>
             <div class="chart-box stats" >
-                <h3>User Stats</h3>
+                <h3>Your Stats</h3>
                 <p id="weight"></p>
                 <p id="bmi"></p>
                 <p id="bmr"></p>
@@ -266,9 +271,9 @@
                 <p id="level"></p>
                 
                 <h3>Progress</h3>
-                <p id="workouts"></p>
-                <p id="cardio"></p>
-                <p id="calories"></p>
+                <p id="totalCaloriesBurnt">Calories Burnt: Loading...</p>
+                <p id="totalStepsCompleted">Steps Completed: Loading...</p>
+                <p id="heartPoints">Heart Points: Loading...</p>
             </div>
         </section>
     </main>

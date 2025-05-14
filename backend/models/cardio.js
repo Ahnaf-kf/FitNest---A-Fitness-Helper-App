@@ -12,7 +12,9 @@ const cardioSchema = new mongoose.Schema({
     type_of_activity: { type: String, enum: ['walking', 'jogging', 'running'], default: 'walking' },
     weekly_goal: { type: Number, default: 70000 },
     current_week_steps: { type: Number, default: 0 },
-    last_week_reset: { type: Date }
+    last_week_reset: { type: Date },
+    daily_miles_progress: { type: Number, default: 0 }, // Added for daily miles tracking
+    last_daily_reset: { type: Date } // Added to track daily reset
   },
   cardio_timer: { type: Number, default: 0 },
   heart_points: { type: Number, default: 0 },
@@ -21,6 +23,9 @@ const cardioSchema = new mongoose.Schema({
   weekly_rewards: {
     streak_count: { type: Number, default: 0 },
     last_reward_claimed: { type: Date }
+  },
+  daily_rewards: { // Added for daily rewards tracking
+    last_daily_claimed: { type: Date }
   }
 });
 
