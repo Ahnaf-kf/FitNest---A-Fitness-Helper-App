@@ -1,15 +1,11 @@
 const express = require('express');
 const dotenv = require('dotenv');
-
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const path = require('path');
-const cors = require('cors');
 dotenv.config({ path: 'D:/Courses/471/project/FitMax---A-fitness-helper-app/FitMax---A-fitness-helper-app/backend/.env' });
 
-
-// Corrected path to workout model
-const Workout = require('./models/workout');
+const mongoose = require('mongoose');
+//const bodyParser = require('body-parser');
+const path = require('path');
+const cors = require('cors');
 
 // Import routes with corrected paths
 const signupRoutes = require('./routes/auth/signup');
@@ -28,7 +24,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// MongoDB connection (removed deprecated options)
+// MongoDB connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.log('MongoDB connection error:', err));
@@ -57,7 +53,7 @@ const pages = {
   '/profilesetup': 'profilesetup.html',
   '/diet_plan': 'diet_plan.html',
   '/mealplan': 'mealplan.html',
-  '/add_custom_meal.html': 'add_custom_meal.html',
+  //'/add_custom_meal.html': 'add_custom_meal.html',
   '/add_custom_meal': 'add_custom_meal.html',
   '/todayworkout': 'todaysworkout.html',
   '/updategoals': 'updategoals.html',

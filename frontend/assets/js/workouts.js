@@ -89,16 +89,12 @@ function generateWorkoutPlan(userId, fitnessLevel) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            showNotification(data.message);
             displayWorkoutPlan(data.workout);
             document.getElementById('currentWeek').textContent = `Week ${data.workout.week_number}`;
-        } else {
-            showNotification(data.message || 'Error generating workout', 'error');
         }
     })
     .catch(error => {
         console.error('Error generating workout:', error);
-        showNotification('Could not generate workout plan. Please try again later.', 'error');
     });
 }
 
@@ -218,6 +214,7 @@ function saveNotesToServer(userId, day, dayNotes, exerciseNotes) {
     });
 }
 
+// Keep only the notification function for notes
 function showNotification(message, type = 'success') {
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;

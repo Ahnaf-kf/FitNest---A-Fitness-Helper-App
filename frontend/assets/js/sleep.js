@@ -72,24 +72,24 @@ async function loadSleepData() {
         const response = await fetch(`/api/sleep/weekly?user_id=${userId}`);
         const data = await response.json();
 
-        // Create a map to store the latest entry for each day using mmdd from backend
+        // Create a map to store the latest entry for each day using ymd from backend
         const sleepMap = new Map();
         data.forEach(entry => {
-            sleepMap.set(entry.mmdd, entry.hours);
+            sleepMap.set(entry.ymd, entry.hours);
         });
 
         // Get the last 7 days starting from today (using local time)
         const labels = [];
         const hours = [];
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Use local midnight
+        today.setHours(0, 0, 0, 0);
 
         for (let i = 6; i >= 0; i--) {
             const date = new Date(today);
             date.setDate(date.getDate() - i);
-            const mmdd = `${date.getMonth() + 1}/${date.getDate()}`;
-            labels.push(mmdd);
-            hours.push(sleepMap.get(mmdd) || 0);
+            const ymd = date.toISOString().split('T')[0];
+            labels.push(`${date.getMonth() + 1}/${date.getDate()}`);
+            hours.push(sleepMap.get(ymd) || 0);
         }
 
         sleepChart.data.labels = labels;
@@ -99,7 +99,6 @@ async function loadSleepData() {
         console.error('Error loading sleep data:', error);
     }
 }
-
 // Load sleep statistics
 async function loadSleepStats() {
     try {

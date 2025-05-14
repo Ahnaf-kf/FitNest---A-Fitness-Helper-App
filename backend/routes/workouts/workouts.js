@@ -73,56 +73,56 @@ const generateWorkoutPlan = (fitness_level, week_number = 1) => {
 };
 
 router.post('/', async (req, res) => {
-  try {
-    const { user_id, fitness_level } = req.body;
-    
-    if (!user_id || !fitness_level) {
-      return res.status(400).json({
-        success: false,
-        message: 'Missing required fields: user_id and fitness_level'
-      });
+    try {
+        const { user_id, fitness_level } = req.body;
+        
+        if (!user_id || !fitness_level) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing required fields: user_id and fitness_level'
+            });
+        }
+
+        const existingWorkout = await Workout.findOne({ user_id })
+            .sort({ week_number: -1 })
+            .limit(1);
+
+        const week_number = existingWorkout ? existingWorkout.week_number + 1 : 1;
+        const workoutPlan = generateWorkoutPlan(fitness_level, week_number);
+
+        if (existingWorkout) {
+            existingWorkout.workout_plan = workoutPlan;
+            existingWorkout.week_number = week_number;
+            existingWorkout.last_updated = Date.now();
+            await existingWorkout.save();
+            
+            return res.status(200).json({ 
+                success: true,
+                message: 'Workout routine updated', 
+                workout: existingWorkout 
+            });
+        }
+
+        const newWorkout = new Workout({ 
+            user_id, 
+            workout_plan: workoutPlan,
+            week_number: 1
+        });
+        await newWorkout.save();
+        
+        res.status(201).json({ 
+            success: true,
+            message: 'Workout routine created', 
+            workout: newWorkout 
+        });
+    } catch (err) {
+        console.error('Error creating/updating workout:', err);
+        res.status(500).json({ 
+            success: false,
+            message: 'Server error while processing workout', 
+            error: err.message 
+        });
     }
-
-    const existingWorkout = await Workout.findOne({ user_id })
-      .sort({ week_number: -1 })
-      .limit(1);
-
-    const week_number = existingWorkout ? existingWorkout.week_number + 1 : 1;
-    const workoutPlan = generateWorkoutPlan(fitness_level, week_number);
-
-    if (existingWorkout) {
-      existingWorkout.workout_plan = workoutPlan;
-      existingWorkout.week_number = week_number;
-      existingWorkout.last_updated = Date.now();
-      await existingWorkout.save();
-      
-      return res.status(200).json({ 
-        success: true,
-        message: 'Workout routine updated', 
-        workout: existingWorkout 
-      });
-    }
-
-    const newWorkout = new Workout({ 
-      user_id, 
-      workout_plan: workoutPlan,
-      week_number: 1
-    });
-    await newWorkout.save();
-    
-    res.status(201).json({ 
-      success: true,
-      message: 'Workout routine created', 
-      workout: newWorkout 
-    });
-  } catch (err) {
-    console.error('Error creating/updating workout:', err);
-    res.status(500).json({ 
-      success: false,
-      message: 'Server error while processing workout', 
-      error: err.message 
-    });
-  }
 });
 router.get('/:user_id', async (req, res) => {
   try {
