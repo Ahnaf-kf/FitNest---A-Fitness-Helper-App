@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fitness App Sign Up</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #272727;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .signup-container {
+      background-color: #332f2fee;
+      padding: 40px 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    .signup-container h2 {
+      margin-bottom: 25px;
+      color: #a200ff;
+      font-size: 30px;
+      font-weight: bold;
+    }
+    .signup-container input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      background-color: #1f1f1f;
+      color: #fff;
+    }
+    .signup-container input::placeholder {
+      color: #aaa;
+    }
+    .signup-container button {
+      width: 100%;
+      padding: 12px;
+      background-color: #a200ff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .signup-container button:hover {
+      background-color: #8900d3;
+    }
+    .signin-link {
+      margin-top: 20px;
+      color: #ccc;
+      font-size: 14px;
+    }
+    .signin-link a {
+      color: #a200ff;
+      text-decoration: none;
+    }
+    .signin-link a:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 480px) {
+      .signup-container {
+        width: 90%;
+        padding: 30px 20px;
+      }
+      .signup-container h2 {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="signup-container">
+    <h2>Create Your Fitness Account</h2>
+    <form id="signup-form">
+      <input type="text" id="fullName" placeholder="Full Name" required />
+      <input type="email" id="email" placeholder="Email Address" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <input type="date" id="dob" placeholder="Date of Birth" required />
+      <button type="submit">Sign Up</button>
+    </form>
+    <div class="signin-link">
+      <p>Already have an account? <a href="/">Sign In</a></p>
+    </div>
+  </div>
+
+  <!-- Link to the external JS file for Sign Up -->
+  <script src="assets/js/sign-up.js"></script>
+</body>
+</html>

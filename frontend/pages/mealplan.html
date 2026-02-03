@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Today's Meal Plan | FitNest</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <script defer src="../assets/js/mealplan.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <button class="logo-btn" onclick="location.href='/dashboard'"><img src="../assets/logos/fitnest.png" alt="FitNest Logo"></button>
+            <ul>
+                <li onclick="location.href='/dashboard'">Dashboard</li>
+                <!--<li onclick="location.href='/routines'">Routines</li>-->
+                <li onclick="location.href='/workouts'">Workouts</li>
+                <li onclick="location.href='/cardio'">Cardio</li>
+                <li onclick="location.href='/diet_plan'">Diet</li>
+                <li onclick="location.href='/sleep'">Sleep</li>
+                <!--<li onclick="location.href='/settings'">Settings</li>-->
+                <li><a href="/updategoals">Goals</a></li> 
+                <!--<li><a href="/todayworkout" id="todaysWorkoutLink">Today's Workout</a></li>-->
+                <!--<li><a href="/mealplan">Today's Meals</a></li>--> 
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+            <header class="header">
+                <h1>Today's Meal Plan</h1>
+            </header>
+
+            <section id="meal-plan">
+                <h3>Breakfast</h3>
+                <p id="breakfast"></p>
+
+                <h3>Lunch</h3>
+                <p id="lunch"></p>
+
+                <h3>Dinner</h3>
+                <p id="dinner"></p>
+
+                <!-- Meals Completed Button -->
+                <button id="mealsCompleted" class="btn">Meals Completed</button>
+                <p id="totalCalories"></p>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

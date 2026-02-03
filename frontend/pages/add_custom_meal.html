@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Custom Meal | FitNest</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <style>
+        :root {
+            --primary: #4b085f;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --danger: #ff91a4;
+            --warning: #f8961e;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #f5f7fa; color: var(--dark); }
+        .container { max-width: 600px; margin: 40px auto; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); padding: 2rem; }
+        h1 { color: var(--primary); margin-bottom: 1.5rem; text-align: center; }
+        .form-group { margin-bottom: 1rem; }
+        .form-row { display: flex; gap: 1rem; margin-bottom: 0.5rem; }
+        .form-row input { flex: 1; padding: 0.7rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; }
+        .btn { background: var(--primary); color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 6px; cursor: pointer; font-weight: 500; transition: background 0.3s; }
+        .btn:hover { background: var(--secondary); }
+        .note-area { width: 100%; min-height: 60px; padding: 0.7rem; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 1rem; font-size: 1rem; }
+        .meal-list { margin-top: 2rem; }
+        .meal-card { background: #f8f9fa; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+        .meal-card h3 { color: var(--primary); margin-bottom: 0.5rem; }
+        .food-list { margin-bottom: 0.5rem; }
+        .food-item { display: flex; justify-content: space-between; margin-bottom: 0.3rem; }
+        .food-item span { color: var(--secondary); }
+        .total-calories { font-weight: 600; color: var(--secondary); }
+        .back-btn { margin-bottom: 1.5rem; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="btn back-btn" onclick="location.href='/diet_plan'">&larr; Back to Diet Plan</button>
+        <h1>Add Custom Meal</h1>
+        <form id="customMealForm">
+            <div id="foodInputs">
+                <div class="form-row">
+                    <input type="text" name="foodName" placeholder="Food name" required>
+                    <input type="number" name="foodGrams" placeholder="Amount (grams)" min="1" required>
+                </div>
+            </div>
+            <button type="button" class="btn" id="addFoodBtn">Add Food</button><br><br>
+            <div class="form-group">
+                <textarea class="note-area" id="mealNote" placeholder="Add a note about this meal..."></textarea>
+            </div>
+            <button type="submit" class="btn">Add Meal</button>
+        </form>
+        <div class="meal-list" id="mealList">
+        </div>
+    </div>
+    <script src="../assets/js/add_custom_meal.js"></script>
+</body>
+</html> 
