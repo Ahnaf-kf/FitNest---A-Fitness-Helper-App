@@ -14,7 +14,17 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById("user_id").value = userId;
   } else {
     alert("User ID not found! Please sign up again.");
-    window.location.href = "../../pages/signup";
+    window.location.href = "/pages/sign-up.html";
+    return;
+  }
+
+  // Prefill birthday from signup, if available
+  const signupDob = localStorage.getItem("signup_dob");
+  if (signupDob) {
+    const birthdayInput = document.getElementById("birthday");
+    if (birthdayInput) {
+      birthdayInput.value = signupDob;
+    }
   }
 });
 
@@ -49,7 +59,7 @@ document.getElementById('profileForm').addEventListener('submit', async function
   };
 
   try {
-    const response = await fetch('http://localhost:5000/api/profile', {
+    const response = await fetch('/api/profile', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
@@ -58,13 +68,44 @@ document.getElementById('profileForm').addEventListener('submit', async function
     const result = await response.json();
 
     if (response.ok) {
-      alert(result.message || 'Profile created successfully!');
-      localStorage.removeItem("user_id");
-      window.location.href = '/dashboard';
+      alert(result.message || 'Profile created successfully! Logging you in...');
+
+      // Attempt automatic sign-in using the credentials from signup
+      const email = localStorage.getItem("signup_email");
+      const password = localStorage.getItem("signup_password");
+
+      if (email && password) {
+        try {
+          const loginResponse = await fetch('/api/auth/signin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+
+          const loginData = await loginResponse.json();
+
+          if (loginResponse.ok) {
+            localStorage.setItem("token", loginData.token);
+            localStorage.setItem("user_id", loginData.user._id);
+          } else {
+            alert(loginData.message || 'Auto sign-in failed. Please sign in manually.');
+          }
+        } catch (loginError) {
+          alert('Auto sign-in failed. Please sign in manually.');
+        }
+      }
+
+      // Clean up temporary signup data
+      localStorage.removeItem("signup_email");
+      localStorage.removeItem("signup_password");
+      localStorage.removeItem("signup_dob");
+
+      window.location.href = '/pages/dashboard.html';
     } else {
       alert(result.message || 'Failed to create profile.');
     }
   } catch (error) {
-    alert('Error submitting profile: ' + error.message);
+    console.error('Profile submit error:', error);
+    alert('Error submitting profile: ' + (error.message || error));
   }
 });

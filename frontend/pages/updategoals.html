@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Goals | FitNest</title>
+    <link rel="icon" href="/assets/logos/fitnest logo dark.png" type="image/png">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/darkmode.css">
+    <script src="../assets/js/session.js"></script>
     <script defer src="../assets/js/updategoals.js"></script>
     <style>
         :root {
@@ -17,6 +21,44 @@
             --danger: #f72585;
             --warning: #f8961e;
         }
+
+        /* Light Mode (Default) */
+        [data-theme="light"] {
+            --bg-primary: #f5f7fa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f8f9fa;
+            --text-primary: #212529;
+            --text-secondary: #666666;
+            --sidebar-bg: linear-gradient(135deg, #4b085f, #3f37c9);
+            --sidebar-text: #ffffff;
+            --header-bg: #ffffff;
+            --dropdown-bg: #ffffff;
+            --dropdown-hover: #f1f1f1;
+            --card-shadow: rgba(0,0,0,0.05);
+            --card-shadow-hover: rgba(0,0,0,0.1);
+            --border-color: #dee2e6;
+            --input-bg: #ffffff;
+            --input-border: #dee2e6;
+        }
+
+        /* Dark Mode */
+        [data-theme="dark"] {
+            --bg-primary: #272727;
+            --bg-secondary: #332f2f;
+            --bg-tertiary: #1f1f1f;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --sidebar-bg: linear-gradient(135deg, #1a1620, #1a1620);
+            --sidebar-text: #ffffff;
+            --header-bg: #332f2f;
+            --dropdown-bg: #332f2f;
+            --dropdown-hover: #3f3f3f;
+            --card-shadow: rgba(0,0,0,0.3);
+            --card-shadow-hover: rgba(162,0,255,0.3);
+            --border-color: #444444;
+            --input-bg: #1f1f1f;
+            --input-border: #444444;
+        }
         
         * {
             margin: 0;
@@ -26,8 +68,9 @@
         }
         
         body {
-            background-color: #f5f7fa;
-            color: var(--dark);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         
         .container {
@@ -38,12 +81,13 @@
         /* Sidebar Styles */
         .sidebar {
             width: 250px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
+            background: var(--sidebar-bg);
+            color: var(--sidebar-text);
             padding: 2rem 1rem;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 10px var(--card-shadow);
             position: fixed;
             height: 100%;
+            transition: background 0.3s ease;
         }
         
         .logo-btn {
@@ -91,40 +135,48 @@
         
         .header {
             margin-bottom: 2rem;
+            background: var(--header-bg);
+            padding: 1rem;
+            border-radius: 12px;
+            transition: background-color 0.3s ease;
         }
         
         .header h1 {
-            color: var(--primary);
+            color: #a200ff;
             font-size: 2rem;
             font-weight: 600;
         }
         
         /* Form Styles */
         #update-goals-form {
-            background: white;
+            background: var(--bg-secondary);
             border-radius: 12px;
             padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px var(--card-shadow);
+            color: var(--text-primary);
         }
         
         label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
+            color: var(--text-primary);
         }
         
         input, select {
             width: 100%;
             padding: 0.8rem;
             margin-bottom: 1rem;
-            border: 1px solid #dee2e6;
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: var(--text-primary);
             border-radius: 8px;
             font-size: 1rem;
         }
         
         input:disabled {
-            background-color: #f8f9fa;
-            color: #6c757d;
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
         }
         
         .button-group {
@@ -135,8 +187,8 @@
         }
         
         .workout-goal-btn {
-            background: #e9ecef;
-            color: var(--dark);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
             border: none;
             padding: 0.8rem 1.5rem;
             border-radius: 8px;
@@ -146,16 +198,16 @@
         }
         
         .workout-goal-btn:hover {
-            background: #dee2e6;
+            background: var(--dropdown-hover);
         }
         
         .workout-goal-btn.active {
-            background: var(--primary);
+            background: #a200ff;
             color: white;
         }
         
         button[type="submit"] {
-            background: var(--primary);
+            background: #a200ff;
             color: white;
             border: none;
             padding: 0.8rem 1.5rem;
@@ -168,8 +220,57 @@
         }
         
         button[type="submit"]:hover {
-            background: var(--secondary);
+            background: #8900d3;
             transform: translateY(-2px);
+        }
+
+        /* Dark Mode Overrides */
+        [data-theme="dark"] #update-goals-form,
+        [data-theme="dark"] .header {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .header h1 {
+            color: #a200ff;
+        }
+
+        [data-theme="dark"] label {
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] input,
+        [data-theme="dark"] select {
+            background: var(--input-bg);
+            color: var(--text-primary);
+            border-color: var(--input-border);
+        }
+
+        [data-theme="dark"] input:disabled {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        [data-theme="dark"] .workout-goal-btn {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .workout-goal-btn:hover {
+            background: #444444;
+        }
+
+        [data-theme="dark"] .workout-goal-btn.active {
+            background: #a200ff;
+            color: white;
+        }
+
+        [data-theme="dark"] button[type="submit"] {
+            background: #a200ff;
+        }
+
+        [data-theme="dark"] button[type="submit"]:hover {
+            background: #8900d3;
         }
         
         /* Responsive Design */
@@ -194,24 +295,38 @@
 <div class="container">
     <!-- Sidebar -->
     <aside class="sidebar">
-        <button class="logo-btn" onclick="location.href='/dashboard'">
+        <button class="logo-btn" onclick="location.href='/pages/dashboard.html'">
             <img src="../assets/logos/fitnest.png" alt="FitNest Logo">
         </button>
         <ul>
-            <li onclick="location.href='/dashboard'">🏠 Dashboard</li>
-            <li onclick="location.href='/workouts'">💪 Workouts</li>
-            <li onclick="location.href='/cardio'">🏃 Cardio</li>
-            <li onclick="location.href='/diet_plan'">🥗 Diet</li>
-            <li onclick="location.href='/updategoals'" class="active">🎯 Goals</li>
-            <li onclick="location.href='/sleep'">💤 Sleep</li>
+            <li onclick="location.href='/pages/dashboard.html'">🏠 Dashboard</li>
+            <li onclick="location.href='/pages/workouts.html'">💪 Workouts</li>
+            <li onclick="location.href='/pages/cardio.html'">🏃 Cardio</li>
+            <li onclick="location.href='/pages/diet_plan.html'">🥗 Diet</li>
+            <li onclick="location.href='/pages/updategoals.html'" class="active">🎯 Goals</li>
+            <li onclick="location.href='/pages/sleep.html'">💤 Sleep</li>
         </ul>
     </aside>
 
     <!-- Main Content -->
     <main class="main">
         <header class="header">
-            <h1>Update Your Goals</h1>
-            <p>Set your fitness targets and personal metrics</p>
+            <div>
+                <h1>Update Your Goals</h1>
+                <p>Set your fitness targets and personal metrics</p>
+            </div>
+            <div class="header-controls">
+                <div class="dark-mode-toggle">
+                    <label for="darkModeToggle" class="toggle-label">🌙</label>
+                    <input type="checkbox" id="darkModeToggle" class="toggle-checkbox">
+                </div>
+                <div class="user-menu">
+                    <button id="userIcon"><i class="fas fa-user"></i></button>
+                    <div class="dropdown" id="userDropdown">
+                        <a href="/pages/logout.html">Log Out</a>
+                    </div>
+                </div>
+            </div>
         </header>
 
         <form id="update-goals-form">
@@ -257,5 +372,12 @@
         </form>
     </main>
 </div>
+<script src="../assets/js/darkmode.js"></script>
+<script>
+  // Quick auth check
+  if (!hasValidSessionLocal()) {
+    window.location.href = '/';
+  }
+</script>
 </body>
 </html>

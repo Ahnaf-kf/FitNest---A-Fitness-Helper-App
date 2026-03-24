@@ -59,7 +59,7 @@ if (!userId) {
             }
             
             displayMealPlan(currentMealPlan);
-            statusDiv.textContent = 'Meal plan generated!';
+            statusDiv.textContent = ''; // Clear the status message when meal plan is generated
 
             // Calculate total calories for today
             const todayIndex = new Date().getDay();
@@ -74,8 +74,7 @@ if (!userId) {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     calories: {
-                        consumed: totalCaloriesToday,
-                        burned: userBMR // Use the user's actual BMR
+                        consumed: totalCaloriesToday
                     }
                 })
             });
@@ -159,11 +158,160 @@ if (!userId) {
                     </tr>
                 `;
             });
+            
+            // Display today's meal items
+            displayTodaysMealItems(mealPlan);
         } catch (error) {
             console.error('Error displaying meal plan:', error);
             document.getElementById('mealPlanStatus').textContent = 'Error displaying meal plan';
             document.getElementById('mealPlanStatus').style.color = 'red';
         }
+    }
+
+    function displayTodaysMealItems(mealPlan) {
+        // Get current day (0=Sunday to 6=Saturday)
+        const todayIndex = new Date().getDay();
+        
+        // Convert to meal plan day index (0=Monday to 6=Sunday)
+        let mealPlanDayIndex;
+        if (todayIndex === 0) { // Sunday
+            mealPlanDayIndex = 6;
+        } else {
+            mealPlanDayIndex = todayIndex - 1;
+        }
+
+        // Display breakfast items
+        const breakfast = mealPlan.breakfast[mealPlanDayIndex] || { items: [], totalCalories: 0 };
+        displayMealItems('todaysBreakfast', breakfast.items);
+
+        // Display lunch items
+        const lunch = mealPlan.lunch[mealPlanDayIndex] || { items: [], totalCalories: 0 };
+        displayMealItems('todaysLunch', lunch.items);
+
+        // Display dinner items
+        const dinner = mealPlan.dinner[mealPlanDayIndex] || { items: [], totalCalories: 0 };
+        displayMealItems('todaysDinner', dinner.items);
+
+        // Load and display custom meals added today
+        loadTodaysCustomMeals();
+
+        // Calculate and display total calories
+        updateTotalCaloriesConsumed(mealPlan, mealPlanDayIndex);
+    }
+
+    function displayMealItems(containerId, items) {
+        const container = document.getElementById(containerId);
+        if (!Array.isArray(items) || items.length === 0) {
+            container.innerHTML = '<p class="no-items">No items planned</p>';
+            return;
+        }
+
+        container.innerHTML = items.map(item => `
+            <div class="meal-item-today">
+                <span class="meal-item-name">${item.name || 'Unknown'}</span>
+                <span class="meal-item-calories">${item.calories || 0} kcal</span>
+            </div>
+        `).join('');
+    }
+
+    async function loadTodaysCustomMeals() {
+        try {
+            const response = await fetch(`/api/custom-meal/${userId}`);
+            if (response.ok) {
+                const meals = await response.json();
+                console.log('Raw API response:', meals); // Debug log
+                console.log('Is array?', Array.isArray(meals)); // Debug log
+                
+                // Ensure meals is an array
+                if (!Array.isArray(meals)) {
+                    console.error('API did not return an array:', meals);
+                    document.getElementById('todaysCustomMeals').innerHTML = '<p class="no-items">Error: Invalid API response</p>';
+                    return;
+                }
+                
+                const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+                console.log('Today date:', today); // Debug log
+                
+                // Filter meals added today and flatten food items
+                const todaysFoodItems = [];
+                meals.forEach(meal => {
+                    // Handle different date formats
+                    let mealDate;
+                    if (meal.date) {
+                        try {
+                            mealDate = new Date(meal.date).toISOString().split('T')[0];
+                        } catch (e) {
+                            console.warn('Invalid date format for meal:', meal);
+                            return;
+                        }
+                    } else {
+                        console.warn('Meal has no date field:', meal);
+                        return;
+                    }
+                    
+                    console.log('Comparing dates - Today:', today, 'Meal date:', mealDate);
+                    
+                    if (mealDate === today && meal.foods && Array.isArray(meal.foods)) {
+                        meal.foods.forEach(food => {
+                            if (food.name && typeof food.calories === 'number') {
+                                todaysFoodItems.push({
+                                    name: food.name,
+                                    calories: food.calories
+                                });
+                            }
+                        });
+                    }
+                });
+
+                console.log('Today\'s food items:', todaysFoodItems); // Debug log
+                
+                if (todaysFoodItems.length === 0) {
+                    document.getElementById('todaysCustomMeals').innerHTML = '<p class="no-items">No custom meals added today</p>';
+                } else {
+                    displayMealItems('todaysCustomMeals', todaysFoodItems);
+                }
+                
+                // Update total calories to include custom meals
+                updateTotalCaloriesWithCustomMeals(todaysFoodItems);
+            } else {
+                console.error('Failed to fetch custom meals:', response.status, response.statusText);
+                document.getElementById('todaysCustomMeals').innerHTML = '<p class="no-items">Error loading custom meals</p>';
+            }
+        } catch (error) {
+            console.error('Error loading custom meals:', error);
+            document.getElementById('todaysCustomMeals').innerHTML = '<p class="no-items">Error loading custom meals</p>';
+        }
+    }
+
+    function updateTotalCaloriesWithCustomMeals(customMeals) {
+        const currentTotal = parseInt(document.getElementById('totalCaloriesConsumed').textContent) || 0;
+        const customMealsTotal = customMeals.reduce((sum, meal) => sum + (meal.calories || 0), 0);
+        document.getElementById('totalCaloriesConsumed').textContent = currentTotal + customMealsTotal;
+    }
+
+    function initializeEmptyTodaysMeals() {
+        // Show empty states for all meal sections
+        document.getElementById('todaysBreakfast').innerHTML = '<p class="no-items">No meal plan generated</p>';
+        document.getElementById('todaysLunch').innerHTML = '<p class="no-items">No meal plan generated</p>';
+        document.getElementById('todaysDinner').innerHTML = '<p class="no-items">No meal plan generated</p>';
+        
+        // Still load custom meals
+        loadTodaysCustomMeals();
+        
+        // Reset total calories
+        document.getElementById('totalCaloriesConsumed').textContent = '0';
+    }
+
+    function updateTotalCaloriesConsumed(mealPlan, mealPlanDayIndex) {
+        const breakfast = mealPlan.breakfast[mealPlanDayIndex] || { totalCalories: 0 };
+        const lunch = mealPlan.lunch[mealPlanDayIndex] || { totalCalories: 0 };
+        const dinner = mealPlan.dinner[mealPlanDayIndex] || { totalCalories: 0 };
+        
+        let totalCalories = breakfast.totalCalories + lunch.totalCalories + dinner.totalCalories;
+
+        // Add custom meals calories (we'll fetch this separately)
+        // For now, we'll update this when custom meals are loaded
+        document.getElementById('totalCaloriesConsumed').textContent = totalCalories;
     }
 
     document.getElementById('mealsCompletedToday').addEventListener('click', async () => {
@@ -390,7 +538,15 @@ if (!userId) {
                 if (data.meal_plans) {
                     currentMealPlan = data.meal_plans;
                     displayMealPlan(currentMealPlan);
+                    document.getElementById('mealPlanStatus').textContent = ''; // Clear message when meal plan exists
+                } else {
+                    document.getElementById('mealPlanStatus').textContent = 'No meal plan generated yet. Click "Generate Meal Plan" to get started.';
+                    // Initialize empty today's meal items
+                    initializeEmptyTodaysMeals();
                 }
+            } else {
+                document.getElementById('mealPlanStatus').textContent = 'No meal plan generated yet. Click "Generate Meal Plan" to get started.';
+                initializeEmptyTodaysMeals();
             }
             
             // Load nutrition notes and initialize sticky note

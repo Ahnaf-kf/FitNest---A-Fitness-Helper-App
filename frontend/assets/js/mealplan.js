@@ -58,10 +58,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                       mealPlan.dinner[today].calories;
 
                 // Update the calories for the day in the backend
-                fetch(`/api/diet/add-calories/${userId}`, {
-                    method: 'POST',
+                fetch(`/api/diet/${userId}`, {
+                    method: 'PUT',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ calories: totalCalories })
+                    body: JSON.stringify({ 
+                        calories: { 
+                            consumed: totalCalories 
+                        } 
+                    })
                 })
                 .then(response => response.json())
                 .then(data => {

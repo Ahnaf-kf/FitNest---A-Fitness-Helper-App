@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fitness App - Logout</title>
+  <link rel="icon" href="/assets/logos/fitnest logo dark.png" type="image/png">
   <style>
     * {
       margin: 0;
@@ -81,13 +82,14 @@
     <p>Are you sure you want to log out?</p>
     <button id="logout-btn">Logout</button>
     <div class="login-link">
-      <p>Changed your mind? <a href="/sign-in">Sign In</a></p>
+      <p>Changed your mind? <a href="/pages/sign-in.html">Sign In</a></p>
     </div>
   </div>
 
+  <script src="../assets/js/session.js"></script>
   <script>
     document.getElementById('logout-btn').addEventListener('click', function() {
-
+      clearSession();
       localStorage.clear();
       sessionStorage.clear();
       window.location.href = '/';

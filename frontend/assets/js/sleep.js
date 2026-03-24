@@ -87,7 +87,7 @@ async function loadSleepData() {
         for (let i = 6; i >= 0; i--) {
             const date = new Date(today);
             date.setDate(date.getDate() - i);
-            const ymd = date.toISOString().split('T')[0];
+            const ymd = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
             labels.push(`${date.getMonth() + 1}/${date.getDate()}`);
             hours.push(sleepMap.get(ymd) || 0);
         }

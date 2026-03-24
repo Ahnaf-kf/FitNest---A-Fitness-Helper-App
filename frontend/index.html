@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FitNest - Your Fitness Companion</title>
+  <link rel="icon" href="assets/logos/fitnest logo dark.png" type="image/png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
+  <script src="assets/js/session.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #0f0f15;
+      color: #fff;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 50px;
+      background-color: #1a1a24;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+    .logo img {
+      height: 40px;
+      width: auto;
+      margin-right: 10px;
+    }
+    .logo .fit {
+      color: #4a3fa3;
+    }
+    .logo .nest {
+      color: #6b5eff;
+    }
+    nav a {
+      color: #8b7dcc;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: 400;
+      transition: color 0.3s;
+    }
+    nav a:hover {
+      color: #6b5eff;
+    }
+    @keyframes fadeInHero {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    .hero {
+      text-align: center;
+      padding: 100px 20px;
+      background: linear-gradient(135deg, #0f0f15 0%, #1a1828 100%);
+    }
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+      color: #7a6bff;
+      animation: fadeInHero 1.5s ease-in;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 0 auto;
+      color: #8b7dcc;
+    }
+    .section {
+      padding: 80px 20px;
+      text-align: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: #0f0f15;
+    }
+    .section h2 {
+      font-size: 2.5rem;
+      font-weight: 600;
+      margin-bottom: 40px;
+      color: #5d52e8;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+    }
+    .feature {
+      margin-bottom: 60px;
+    }
+    .feature h3 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #6b5eff;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+    }
+    .feature p {
+      font-size: 1rem;
+      color: #7a6dbd;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .cta {
+      background-color: #1a1a24;
+      padding: 80px 20px;
+      text-align: center;
+    }
+    .cta h2 {
+      font-size: 2.5rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #5d52e8;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+    }
+    .cta p {
+      font-size: 1.2rem;
+      margin-bottom: 40px;
+      color: #8b7dcc;
+    }
+    .cta-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    .btn {
+      padding: 15px 30px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.3s;
+      display: inline-block;
+    }
+    .btn-primary {
+      background-color: #5d52e8;
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(93, 82, 232, 0.4);
+    }
+    .btn-primary:hover {
+      background-color: #4d42d8;
+      box-shadow: 0 6px 20px rgba(93, 82, 232, 0.6);
+    }
+    .btn-secondary {
+      background-color: transparent;
+      color: #5d52e8;
+      border: 2px solid #5d52e8;
+    }
+    .btn-secondary:hover {
+      background-color: #5d52e8;
+      color: #fff;
+    }
+    @media (max-width: 768px) {
+      header {
+        padding: 20px 20px;
+        flex-direction: column;
+      }
+      .logo {
+        margin-bottom: 10px;
+      }
+      nav {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      nav a {
+        margin: 5px 0;
+      }
+      .hero h1 {
+        font-size: 2rem;
+      }
+      .hero p {
+        font-size: 1rem;
+      }
+      .section h2 {
+        font-size: 2rem;
+      }
+      .feature h3 {
+        font-size: 1.5rem;
+      }
+      .cta h2 {
+        font-size: 2rem;
+      }
+      .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="assets/logos/fitnest logo dark.png" alt="FitNest logo" />
+      <span class="fit">FIT</span><span class="nest">NEST</span>
+    </div>
+    <nav>
+      <a href="/pages/sign-in.html">Sign In</a>
+      <a href="/pages/sign-up.html">Sign Up</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>FITNEST: Discipline, Tracked. Progress, Earned.</h1>
+    <p>No guessing. No excuses. Uncompromised tracking for your ambition. Monitor every workout, every rep, every meal, and every night's rest with military precision.</p>
+  </section>
+
+  <section class="section">
+    <h2>Data-Driven Discipline</h2>
+    <p style="font-size: 1.1rem; color: #8b7dcc; margin-bottom: 60px;">Your Goals, Engineered. Uncompromised Tracking for Your Ambition.</p>
+
+    <div class="feature">
+      <h3>Workouts</h3>
+      <p>Stop guessing. Start tracking. Log every exercise, set, and rep with military precision. Monitor your progress over time, enforce consistent gains, and visualize the payoff with detailed progress charts that reward your discipline.</p>
+    </div>
+
+    <div class="feature">
+      <h3>Cardio</h3>
+      <p>Log every session to maximize your cardiovascular engine. FitNest provides the data required to balance strict aerobic training with strength, ensuring no effort is wasted on average results. Build your foundation. Document your edge.</p>
+    </div>
+
+    <div class="feature">
+      <h3>Meals</h3>
+      <p>Rule your kitchen. Implement custom meal plans and track macros precisely. Whether your target is composition change or pure performance fuel, FitNest provides the metrics you need to ensure you are building, not just guessing.</p>
+    </div>
+
+    <div class="feature">
+      <h3>Sleep</h3>
+      <p>Discipline demands recovery. Prioritize restoration with precise sleep tracking. Analyze duration and quality to correlate exactly how rest impacts your output. Optimize recovery—because gains aren't made in the gym; they are made in bed.</p>
+    </div>
+  </section>
+
+  <section class="cta">
+    <h2>Join the FitNest Community Today</h2>
+    <p>Start your journey towards becoming the best version of yourself. Sign up now and take the first step towards a healthier, more fulfilling life.</p>
+    <div class="cta-buttons">
+      <a href="/pages/sign-up.html" class="btn btn-primary">Sign Up Now</a>
+      <a href="/pages/sign-in.html" class="btn btn-secondary">Already a Member? Sign In</a>
+    </div>
+  </section>
+
+  <script>
+    // Quick auth check - if logged in, redirect to dashboard
+    if (hasValidSessionLocal()) {
+      window.location.href = '/pages/dashboard.html';
+    }
+    // Verify with backend in background (non-blocking)
+    checkSession().then(session => {
+      if (session.isValid) {
+        window.location.href = '/pages/dashboard.html';
+      }
+    });
+  </script>
+</body>
+</html>

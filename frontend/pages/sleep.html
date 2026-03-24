@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sleep Tracker | FitNest</title>
+    <link rel="icon" href="/assets/logos/fitnest logo dark.png" type="image/png">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/darkmode.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../assets/js/session.js"></script>
     <script defer src="../assets/js/sleep.js"></script>
     <style>
         :root {
@@ -21,6 +25,44 @@
             --food-orange: #e67e22;
             --food-blue: #3498db;
         }
+
+        /* Light Mode (Default) */
+        [data-theme="light"] {
+            --bg-primary: #f5f7fa;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f8f9fa;
+            --text-primary: #212529;
+            --text-secondary: #666666;
+            --sidebar-bg: linear-gradient(135deg, #4b085f, #3f37c9);
+            --sidebar-text: #ffffff;
+            --header-bg: #ffffff;
+            --dropdown-bg: #ffffff;
+            --dropdown-hover: #f1f1f1;
+            --card-shadow: rgba(0,0,0,0.05);
+            --card-shadow-hover: rgba(0,0,0,0.1);
+            --border-color: #dee2e6;
+            --input-bg: #ffffff;
+            --input-border: #dee2e6;
+        }
+
+        /* Dark Mode */
+        [data-theme="dark"] {
+            --bg-primary: #272727;
+            --bg-secondary: #332f2f;
+            --bg-tertiary: #1f1f1f;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --sidebar-bg: linear-gradient(135deg, #1a1620, #1a1620);
+            --sidebar-text: #ffffff;
+            --header-bg: #332f2f;
+            --dropdown-bg: #332f2f;
+            --dropdown-hover: #3f3f3f;
+            --card-shadow: rgba(0,0,0,0.3);
+            --card-shadow-hover: rgba(162,0,255,0.3);
+            --border-color: #444444;
+            --input-bg: #1f1f1f;
+            --input-border: #444444;
+        }
         
         * {
             margin: 0;
@@ -30,8 +72,9 @@
         }
         
         body {
-            background-color: #f5f7fa;
-            color: var(--dark);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         
         .container {
@@ -42,12 +85,13 @@
         /* Sidebar Styles */
         .sidebar {
             width: 250px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
+            background: var(--sidebar-bg);
+            color: var(--sidebar-text);
             padding: 2rem 1rem;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 10px var(--card-shadow);
             position: fixed;
             height: 100%;
+            transition: background 0.3s ease;
         }
         
         .logo-btn {
@@ -95,10 +139,14 @@
         
         .header {
             margin-bottom: 2rem;
+            background: var(--header-bg);
+            padding: 1rem;
+            border-radius: 12px;
+            transition: background-color 0.3s ease;
         }
         
         .header h1 {
-            color: var(--primary);
+            color: #a200ff;
             font-size: 2rem;
             font-weight: 600;
         }
@@ -111,17 +159,19 @@
         }
 
         .sleep-graph {
-            background: white;
+            background: var(--bg-secondary);
             padding: 1.5rem;
             border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px var(--card-shadow);
+            color: var(--text-primary);
         }
 
         .sleep-input {
-            background: white;
+            background: var(--bg-secondary);
             padding: 1.5rem;
             border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px var(--card-shadow);
+            color: var(--text-primary);
         }
 
         .form-group {
@@ -131,14 +181,16 @@
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            color: var(--dark);
+            color: var(--text-primary);
             font-weight: 500;
         }
 
         .form-group input {
             width: 100%;
             padding: 0.8rem;
-            border: 1px solid #ddd;
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: var(--text-primary);
             border-radius: 6px;
             font-size: 1rem;
         }
@@ -166,36 +218,40 @@
         }
 
         .stat-card {
-            background: white;
+            background: var(--bg-secondary);
             padding: 1.5rem;
             border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px var(--card-shadow);
             text-align: center;
+            color: var(--text-primary);
         }
 
         .stat-card h3 {
-            color: var(--primary);
+            color: #a200ff;
             margin-bottom: 0.5rem;
         }
 
         .stat-card p {
             font-size: 1.5rem;
             font-weight: 600;
-            color: var(--dark);
+            color: var(--text-primary);
         }
 
         .sleep-notes {
-            background: white;
+            background: var(--bg-secondary);
             padding: 1.5rem;
             border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px var(--card-shadow);
+            color: var(--text-primary);
         }
 
         .sleep-notes textarea {
             width: 100%;
             height: 150px;
             padding: 1rem;
-            border: 1px solid #ddd;
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: var(--text-primary);
             border-radius: 6px;
             resize: none;
             margin-bottom: 1rem;
@@ -215,7 +271,7 @@
         }
 
         .sticky-note h3 {
-            color: var(--primary);
+            color: #4b085f;
             margin-bottom: 10px;
         }
 
@@ -228,12 +284,59 @@
             resize: none;
             margin-bottom: 10px;
             font-family: 'Poppins', sans-serif;
+            color: #212529;
         }
 
         .sticky-note .btn {
-            background: var(--primary);
+            background: #4b085f;
+            color: white;
+            border: none;
             width: 100%;
             padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Dark Mode Overrides */
+        [data-theme="dark"] .sleep-graph,
+        [data-theme="dark"] .sleep-input,
+        [data-theme="dark"] .sleep-notes,
+        [data-theme="dark"] .stat-card,
+        [data-theme="dark"] .header {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .stat-card h3,
+        [data-theme="dark"] .sleep-input h2,
+        [data-theme="dark"] .sleep-notes h2,
+        [data-theme="dark"] .header h1 {
+            color: #a200ff;
+        }
+
+        [data-theme="dark"] .form-group label {
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .form-group input {
+            background: var(--input-bg);
+            color: var(--text-primary);
+            border-color: var(--input-border);
+        }
+
+        [data-theme="dark"] .sleep-notes textarea {
+            background: var(--input-bg);
+            color: var(--text-primary);
+            border-color: var(--input-border);
+        }
+
+        [data-theme="dark"] .btn {
+            background: #a200ff;
+        }
+
+        [data-theme="dark"] .btn:hover {
+            background: #8900d3;
         }
     </style>
 </head>
@@ -241,21 +344,35 @@
     <div class="container">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <button class="logo-btn" onclick="location.href='/dashboard'">
+            <button class="logo-btn" onclick="location.href='/pages/dashboard.html'">
                 <img src="../assets/logos/fitnest.png" alt="FitNest Logo">
             </button>
             <ul>
-                <li onclick="location.href='/dashboard'">🏠 Dashboard</li>
-                <li onclick="location.href='/workouts'">💪 Workouts</li>
-                <li onclick="location.href='/cardio'">🏃 Cardio</li>
-                <li onclick="location.href='/diet_plan'">🥗 Diet</li>
-                <li onclick="location.href='/updategoals'">🎯 Goals</li>
-                <li onclick="location.href='/sleep'" class="active">💤 Sleep</li>
+                <li onclick="location.href='/pages/dashboard.html'">🏠 Dashboard</li>
+                <li onclick="location.href='/pages/workouts.html'">💪 Workouts</li>
+                <li onclick="location.href='/pages/cardio.html'">🏃 Cardio</li>
+                <li onclick="location.href='/pages/diet_plan.html'">🥗 Diet</li>
+                <li onclick="location.href='/pages/updategoals.html'">🎯 Goals</li>
+                <li onclick="location.href='/pages/sleep.html'" class="active">💤 Sleep</li>
             </ul>
         </aside>
         <main class="main">
             <div class="header">
-                <h1>Sleep Tracker</h1>
+                <div>
+                    <h1>Sleep Tracker</h1>
+                </div>
+                <div class="header-controls">
+                    <div class="dark-mode-toggle">
+                        <label for="darkModeToggle" class="toggle-label">🌙</label>
+                        <input type="checkbox" id="darkModeToggle" class="toggle-checkbox">
+                    </div>
+                    <div class="user-menu">
+                        <button id="userIcon"><i class="fas fa-user"></i></button>
+                        <div class="dropdown" id="userDropdown">
+                            <a href="/pages/logout.html">Log Out</a>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="sleep-stats">
@@ -300,5 +417,12 @@
             </div>
         </main>
     </div>
+<script src="../assets/js/darkmode.js"></script>
+<script>
+  // Quick auth check
+  if (!hasValidSessionLocal()) {
+    window.location.href = '/';
+  }
+</script>
 </body>
 </html>

@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs'); // For password hashing
 const jwt = require('jsonwebtoken');
 const User = require('../../models/user'); // Import User model (ensure the model exists)
+const Profile = require('../../models/profile'); // profile data for completeness check
 const dotenv = require('dotenv'); // To load environment variables
 
 dotenv.config(); // Load .env file
@@ -27,10 +28,15 @@ router.post('/', async (req, res) => {
     // Generate JWT token using the secret from the environment variable
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
     
-    // Return success response with token and user details
+    // Determine if user has completed profile
+    const profile = await Profile.findOne({ user_id: user._id });
+    const profileIncomplete = !profile;
+
+    // Return success response with token, profile flag, and user details
     res.status(200).json({
       message: 'Login successful',
       token,
+      profileIncomplete,
       user: {
         _id: user._id,
         fullName: user.fullName,

@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fitness App Sign Up</title>
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="icon" href="/assets/logos/fitnest logo dark.png" type="image/png">
+  <link rel="stylesheet" href="../assets/css/styles.css">
   <style>
     * {
       margin: 0;
@@ -13,26 +14,33 @@
     }
     body {
       font-family: 'Arial', sans-serif;
-      background-color: #272727;
+      background-color: #1a1a1a;
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
     }
     .signup-container {
-      background-color: #332f2fee;
+      background-color: #121217;
       padding: 40px 30px;
       border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
       width: 100%;
       max-width: 400px;
       text-align: center;
     }
     .signup-container h2 {
       margin-bottom: 25px;
-      color: #a200ff;
+      color: #6b5eff;
       font-size: 30px;
       font-weight: bold;
+    }
+    .form-logo {
+      height: 80px;
+      margin-bottom: 30px;
+    }
+    .clickable-logo {
+      cursor: pointer;
     }
     .signup-container input {
       width: 100%;
@@ -86,6 +94,9 @@
 </head>
 <body>
   <div class="signup-container">
+    <a href="/" aria-label="Go to home">
+      <img class="form-logo clickable-logo" src="../assets/logos/fitnest logo dark.png" alt="FitNest logo">
+    </a>
     <h2>Create Your Fitness Account</h2>
     <form id="signup-form">
       <input type="text" id="fullName" placeholder="Full Name" required />
@@ -95,11 +106,16 @@
       <button type="submit">Sign Up</button>
     </form>
     <div class="signin-link">
-      <p>Already have an account? <a href="/">Sign In</a></p>
+      <p>Already have an account? <a href="/pages/sign-in.html">Sign In</a></p>
     </div>
   </div>
 
   <!-- Link to the external JS file for Sign Up -->
-  <script src="assets/js/sign-up.js"></script>
+  <script src="../assets/js/session.js"></script>
+  <script src="../assets/js/sign-up.js"></script>
+  <script>
+    // Check if user is already logged in and redirect to dashboard
+    redirectIfAuth();
+  </script>
 </body>
 </html>

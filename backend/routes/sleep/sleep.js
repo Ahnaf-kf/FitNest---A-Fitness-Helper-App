@@ -9,7 +9,7 @@ function deduplicateByDay(entries) {
     for (const entry of entries) {
         const date = new Date(entry.date);
         date.setHours(0, 0, 0, 0);
-        const key = date.toISOString().split('T')[0];
+        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
         // Always keep the latest entry for the day
         if (!map.has(key) || new Date(entry.date) > new Date(map.get(key).date)) {
             map.set(key, entry);
@@ -49,7 +49,7 @@ router.get('/weekly', async (req, res) => {
             return {
                 ...entry.toObject(),
                 mmdd,
-                ymd: date.toISOString().split('T')[0]
+                ymd: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
             };
         });
 

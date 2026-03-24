@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const userId = localStorage.getItem('user_id');
     
     if (!userId) {
-        alert('User not signed in. Please log in.');
+        showNotification('User not signed in. Please log in.', 'error');
         window.location.href = '/';
         return;
     }

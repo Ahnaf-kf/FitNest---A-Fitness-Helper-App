@@ -1,0 +1,9 @@
+{
+  "name": "fitnest-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npm --prefix backend start",
+    "install-backend": "npm --prefix backend install"
+  }
+}

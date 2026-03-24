@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fitness App Sign In</title>
+  <link rel="icon" href="/assets/logos/fitnest logo dark.png" type="image/png">
   <link rel="stylesheet" href="..\assets\css\styles.css">
   <style>
     * {
@@ -13,26 +14,33 @@
     }
     body {
       font-family: 'Arial', sans-serif;
-      background-color: #272727;
+      background-color: #1a1a1a;
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
     }
     .signin-container {
-      background-color: #332f2fee;
+      background-color: #121217;
       padding: 40px 30px;
       border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
       width: 100%;
       max-width: 400px;
       text-align: center;
     }
     .signin-container h2 {
       margin-bottom: 25px;
-      color: #a200ff;
+      color: #6b5eff;
       font-size: 30px;
       font-weight: bold;
+    }
+    .form-logo {
+      height: 80px;
+      margin-bottom: 30px;
+    }
+    .clickable-logo {
+      cursor: pointer;
     }
     .signin-container input {
       width: 100%;
@@ -86,6 +94,9 @@
 </head>
 <body>
   <div class="signin-container">
+    <a href="/" aria-label="Go to home">
+      <img class="form-logo clickable-logo" src="../assets/logos/fitnest logo dark.png" alt="FitNest logo">
+    </a>
     <h2>Welcome Back</h2>
     <form id="signin-form">
       <input type="email" id="email" placeholder="Email Address" required />
@@ -93,11 +104,16 @@
       <button type="submit">Sign In</button>
     </form>
     <div class="signup-link">
-      <p>Don't have an account? <a href="/sign-up">Sign Up</a></p>
+      <p>Don't have an account? <a href="/pages/sign-up.html">Sign Up</a></p>
     </div>
   </div>
 
   <!-- Link to the external JS file for Sign In -->
+  <script src="..\assets\js\session.js"></script>
   <script src="..\assets\js\sign-in.js"></script>
+  <script>
+    // Check if user is already logged in and redirect to dashboard
+    redirectIfAuth();
+  </script>
 </body>
 </html>

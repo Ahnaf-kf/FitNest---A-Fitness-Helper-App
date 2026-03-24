@@ -3,12 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <title>User Profile</title>
+  <link rel="icon" href="/assets/logos/fitnest logo dark.png" type="image/png">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins&display=swap">
+  <script src="../assets/js/session.js"></script>
   <script defer src="../assets/js/profilesetup.js"></script>
+  <script>
+    // Quick auth check - allow access if user_id exists (newly signed up user) or has valid session
+    const hasUserId = !!localStorage.getItem('user_id');
+    const hasValidSession = hasValidSessionLocal();
+    if (!hasUserId && !hasValidSession) {
+      window.location.href = '/';
+    }
+  </script>
   <style>
     body {
       margin: 0;
-      background: #1e1b2e;
+      background: #0f0f15;
       font-family: 'Poppins', sans-serif;
       color: #eee;
       display: flex;
@@ -25,14 +35,18 @@
       color: #b694f6;
       text-shadow: 0 0 10px #b694f6;
     }
+    .form-logo {
+      height: 80px;
+      margin-bottom: 30px;
+    }
 
     .form-container {
-      background: #292542;
+      background: #12101f;
       padding: 30px 40px;
       border-radius: 20px;
       box-shadow:
-        inset 5px 5px 10px #1a172a,
-        inset -5px -5px 10px #3a325b,
+        inset 5px 5px 10px #0e0c15,
+        inset -5px -5px 10px #221f33,
         0 0 15px rgba(182, 148, 246, 0.3);
       width: 400px;
     }
@@ -81,6 +95,7 @@
   </style>
 </head>
 <body>
+  <img class="form-logo" src="../assets/logos/fitnest logo dark.png" alt="FitNest logo">
   <div class="logo">FitNest Profile</div>
   <div class="form-container">
     <h1>Profile Setup</h1>

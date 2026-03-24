@@ -105,8 +105,31 @@ function generateMealPlan(userGoal, maintenanceCalories, selectedMeals) {
 router.get('/:user_id', async (req, res) => {
     const { user_id } = req.params;
     try {
-        const diet = await Diet.findOne({ user_id });
-        if (!diet) return res.status(404).json({ message: 'Diet plan not found' });
+        let diet = await Diet.findOne({ user_id });
+        if (!diet) {
+            // Get user's profile to access BMR
+            const profile = await Profile.findOne({ user_id });
+            const userBMR = profile?.metrics?.bmr || 2000;
+            
+            // Create new diet document
+            diet = new Diet({
+                user_id,
+                meal_plans: {
+                    breakfast: Array(7).fill().map(() => ({ meal: 'Not set', calories: 0 })),
+                    lunch: Array(7).fill().map(() => ({ meal: 'Not set', calories: 0 })),
+                    dinner: Array(7).fill().map(() => ({ meal: 'Not set', calories: 0 })),
+                    totalCalories: 0
+                },
+                calories: {
+                    consumed: [],
+                    burned: []
+                },
+                bmr: userBMR,
+                custom_meals: {},
+                nutrition_notes: []
+            });
+            await diet.save();
+        }
         
         const response = {
             ...diet._doc,
@@ -151,15 +174,25 @@ router.put('/:user_id', async (req, res) => {
             }
         }
 
-        // Always set burned calories to user's BMR
-        const existingBurnedEntry = diet.calories.burned.find(entry => entry.date === today);
-        if (existingBurnedEntry) {
-            existingBurnedEntry.amount = userBMR;
+        if (calories && calories.burned !== undefined) {
+            const existingBurnedEntry = diet.calories.burned.find(entry => entry.date === today);
+            if (existingBurnedEntry) {
+                existingBurnedEntry.amount = calories.burned;
+            } else {
+                diet.calories.burned.push({
+                    date: today,
+                    amount: calories.burned
+                });
+            }
         } else {
-            diet.calories.burned.push({
-                date: today,
-                amount: userBMR
-            });
+            // Only set burned to BMR if no entry exists for today
+            const existingBurnedEntry = diet.calories.burned.find(entry => entry.date === today);
+            if (!existingBurnedEntry) {
+                diet.calories.burned.push({
+                    date: today,
+                    amount: userBMR
+                });
+            }
         }
 
         if (nutrition_notes !== undefined) {

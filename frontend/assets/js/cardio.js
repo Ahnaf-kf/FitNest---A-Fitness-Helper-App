@@ -268,4 +268,113 @@ document.addEventListener('DOMContentLoaded', function() {
             }
           });
     });
+
+    // Location autocomplete functionality
+    const debounce = (func, delay) => {
+        let timeoutId;
+        return (...args) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => func(...args), delay);
+        };
+    };
+
+    async function fetchLocationSuggestions(query) {
+        if (!query || query.length < 2) return [];
+        try {
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`;
+            const response = await fetch(url, {
+                headers: { 'Accept': 'application/json' }
+            });
+            const results = await response.json();
+            return results.map(result => ({
+                lat: parseFloat(result.lat),
+                lon: parseFloat(result.lon),
+                displayName: result.display_name,
+                address: result.address
+            }));
+        } catch (err) {
+            console.error('Error fetching suggestions:', err);
+            return [];
+        }
+    }
+
+    function showSuggestions(inputElement, suggestionsContainer, suggestions, callback) {
+        if (suggestions.length === 0) {
+            suggestionsContainer.style.display = 'none';
+            return;
+        }
+
+        suggestionsContainer.innerHTML = suggestions.map((suggestion, idx) => `
+            <div class="suggestion-item" data-index="${idx}">
+                <div class="location-name">${suggestion.displayName.split(',').slice(0, 2).join(',')}</div>
+                <div class="location-details">${suggestion.displayName}</div>
+            </div>
+        `).join('');
+
+        suggestionsContainer.style.display = 'block';
+
+        Array.from(suggestionsContainer.querySelectorAll('.suggestion-item')).forEach(item => {
+            item.addEventListener('click', () => {
+                const index = parseInt(item.dataset.index);
+                const selected = suggestions[index];
+                inputElement.value = selected.displayName.split(',').slice(0, 2).join(',');
+                suggestionsContainer.style.display = 'none';
+                callback(selected);
+            });
+        });
+    }
+
+    // From input autocomplete
+    const fromInput = document.getElementById('fromInput');
+    const fromSuggestions = document.getElementById('fromSuggestions');
+    const debouncedFromSearch = debounce(async (query) => {
+        const suggestions = await fetchLocationSuggestions(query);
+        showSuggestions(fromInput, fromSuggestions, suggestions, () => {});
+    }, 300);
+
+    fromInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim();
+        if (query.length < 2) {
+            fromSuggestions.style.display = 'none';
+            return;
+        }
+        debouncedFromSearch(query);
+    });
+
+    fromInput.addEventListener('focus', () => {
+        if (fromInput.value.length >= 2 && fromSuggestions.innerHTML) {
+            fromSuggestions.style.display = 'block';
+        }
+    });
+
+    // To input autocomplete
+    const toInput = document.getElementById('toInput');
+    const toSuggestions = document.getElementById('toSuggestions');
+    const debouncedToSearch = debounce(async (query) => {
+        const suggestions = await fetchLocationSuggestions(query);
+        showSuggestions(toInput, toSuggestions, suggestions, () => {});
+    }, 300);
+
+    toInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim();
+        if (query.length < 2) {
+            toSuggestions.style.display = 'none';
+            return;
+        }
+        debouncedToSearch(query);
+    });
+
+    toInput.addEventListener('focus', () => {
+        if (toInput.value.length >= 2 && toSuggestions.innerHTML) {
+            toSuggestions.style.display = 'block';
+        }
+    });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.location-input-wrapper')) {
+            fromSuggestions.style.display = 'none';
+            toSuggestions.style.display = 'none';
+        }
+    });
 });

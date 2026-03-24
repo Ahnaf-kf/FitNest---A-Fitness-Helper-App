@@ -1,15 +1,21 @@
 const express = require('express');
 const dotenv = require('dotenv');
-dotenv.config({ path: 'D:/Courses/471/project/FitMax---A-fitness-helper-app/FitMax---A-fitness-helper-app/backend/.env' });
+const path = require('path');
+const dns = require('dns');
+
+// Ensure Node uses public DNS servers that support SRV lookups (for mongodb+srv URIs)
+dns.setServers(['8.8.8.8', '1.1.1.1']);
+
+dotenv.config({ path: path.join(__dirname, 'models/fitmax.env') });
 
 const mongoose = require('mongoose');
 //const bodyParser = require('body-parser');
-const path = require('path');
 const cors = require('cors');
 
 // Import routes with corrected paths
 const signupRoutes = require('./routes/auth/signup');
 const signinRoutes = require('./routes/auth/signin');
+const verifyRoutes = require('./routes/auth/verify');
 const profileRoutes = require('./routes/profile/profile');
 const workoutRoutes = require('./routes/workouts/workouts');
 const cardioRoutes = require('./routes/cardio/cardio');
@@ -32,6 +38,7 @@ mongoose.connect(process.env.MONGO_URI)
 // Routes
 app.use('/api/auth/signup', signupRoutes);
 app.use('/api/auth/signin', signinRoutes);
+app.use('/api/auth/verify', verifyRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/workouts', workoutRoutes);
 app.use('/api/cardio', cardioRoutes);

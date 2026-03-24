@@ -4,22 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Today's Workout</title>
+    <link rel="icon" href="/assets/logos/fitnest logo dark.png" type="image/png">
+    <link rel="icon" href="/assets/logos/fitnest logo dark.png" type="image/png">
     <link rel="stylesheet" href="../assets/css/styles.css">
+    <script src="../assets/js/session.js"></script>
 </head>
 <body>
 <div class="container">
     <!-- Sidebar -->
     <aside class="sidebar">
-        <button class="logo-btn" onclick="location.href='/dashboard'"><img src="../assets/logos/fitnest.png" alt="FitNest Logo"></button>
+        <button class="logo-btn" onclick="location.href='/pages/dashboard.html'"><img src="../assets/logos/fitnest.png" alt="FitNest Logo"></button>
         <ul>
-            <li onclick="location.href='/dashboard'">Dashboard</li>
+            <li onclick="location.href='/pages/dashboard.html'">Dashboard</li>
             <!--<li onclick="location.href='/routines'">Routines</li>-->
-            <li onclick="location.href='/workouts'">Workouts</li>
-            <li onclick="location.href='/cardio'">Cardio</li>
-            <li onclick="location.href='/diet_plan'">Diet</li>
-            <li onclick="location.href='/sleep'">Sleep</li>
+            <li onclick="location.href='/pages/workouts.html'">Workouts</li>
+            <li onclick="location.href='/pages/cardio.html'">Cardio</li>
+            <li onclick="location.href='/pages/diet_plan.html'">Diet</li>
+            <li onclick="location.href='/pages/sleep.html'">Sleep</li>
             <!--<li onclick="location.href='/settings'">Settings</li>-->
-            <li><a href="/updategoals">Goals</a></li> 
+            <li><a href="/pages/updategoals.html">Goals</a></li> 
             <!--<li><a href="/todayworkout" id="todaysWorkoutLink">Today's Workout</a></li>-->
             <!--<li><a href="/mealplan">Today's Meals</a></li>--> 
         </ul>
@@ -43,5 +46,11 @@
 </div>
 
 <script src="../assets/js/todaysWorkout.js"></script>
+<script>
+  // Quick auth check
+  if (!hasValidSessionLocal()) {
+    window.location.href = '/';
+  }
+</script>
 </body>
 </html>

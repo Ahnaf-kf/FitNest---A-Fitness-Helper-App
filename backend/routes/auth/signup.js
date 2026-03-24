@@ -34,7 +34,12 @@ router.post('/', async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).json({ message: 'Error signing up user', error: err });
+    console.error('Error signing up user (debug):', err);
+    res.status(500).json({
+      message: 'Error signing up user (debug)',
+      errorMessage: err?.message || String(err),
+      errorName: err?.name || null,
+    });
   }
 });
 

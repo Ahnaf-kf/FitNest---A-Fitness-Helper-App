@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const userId = localStorage.getItem("user_id");
 
   if (!userId) {
-    alert("User not signed in. Please log in.");
+    showNotification("User not signed in. Please log in.", 'error');
     window.location.href = '/';  // Redirect to sign-in page
     return;
   }
@@ -96,24 +96,26 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log("API response:", data);  // Debugging API response
 
       if (data.success) {
-        // Display success message directly on the page
-        const successMessageElement = document.createElement('div');
-        successMessageElement.classList.add('success-message');
-        successMessageElement.textContent = data.message;  // Show success message from backend
-        document.body.appendChild(successMessageElement);  // Append the message to the body (or any other element)
-        
-        // Optionally, hide the message after a few seconds
-        setTimeout(() => {
-          successMessageElement.style.display = 'none';
-        }, 5000);
-
-        window.location.href = '/dashboard'; // Redirect back to dashboard
+        showNotification(data.message || 'Goals updated successfully!');
+        window.location.href = '/pages/dashboard.html'; // Redirect back to dashboard
       } else {
-        alert('Failed to update goals. Please try again later.');
+        showNotification('Failed to update goals. Please try again later.', 'error');
       }
     } catch (err) {
       console.error("Error updating goals:", err);
-      alert("An error occurred while updating your goals.");
+      showNotification("An error occurred while updating your goals.", 'error');
     }
   });
 });
+
+// Notification function
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}

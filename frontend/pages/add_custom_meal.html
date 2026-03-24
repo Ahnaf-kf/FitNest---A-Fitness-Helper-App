@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Custom Meal | FitNest</title>
+    <link rel="icon" href="/assets/logos/fitnest logo dark.png" type="image/png">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+    <script src="../assets/js/session.js"></script>
     <style>
         :root {
             --primary: #4b085f;
@@ -28,22 +30,87 @@
         .note-area { width: 100%; min-height: 60px; padding: 0.7rem; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 1rem; font-size: 1rem; }
         .meal-list { margin-top: 2rem; }
         .meal-card { background: #f8f9fa; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
-        .meal-card h3 { color: var(--primary); margin-bottom: 0.5rem; }
+        .meal-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        }
+        .add-calories-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        .add-calories-btn:hover {
+            background: #4cc9f0;
+        }
+        .add-calories-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
         .food-list { margin-bottom: 0.5rem; }
         .food-item { display: flex; justify-content: space-between; margin-bottom: 0.3rem; }
         .food-item span { color: var(--secondary); }
         .total-calories { font-weight: 600; color: var(--secondary); }
         .back-btn { margin-bottom: 1.5rem; display: inline-block; }
+        .food-input-wrapper { position: relative; }
+        .food-suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .food-suggestion-item {
+            padding: 0.8rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s ease;
+        }
+        .food-suggestion-item:hover {
+            background: #f8f9fa;
+            color: var(--primary);
+        }
+        .food-suggestion-item:last-child {
+            border-bottom: none;
+        }
+        .food-name {
+            font-weight: 500;
+            color: var(--dark);
+        }
+        .food-details {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.2rem;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <button class="btn back-btn" onclick="location.href='/diet_plan'">&larr; Back to Diet Plan</button>
+        <button class="btn back-btn" onclick="location.href='/pages/diet_plan.html'">&larr; Back to Diet Plan</button>
         <h1>Add Custom Meal</h1>
         <form id="customMealForm">
             <div id="foodInputs">
                 <div class="form-row">
-                    <input type="text" name="foodName" placeholder="Food name" required>
+                    <div class="food-input-wrapper">
+                        <input type="text" name="foodName" placeholder="Food name" required>
+                        <div class="food-suggestions-dropdown" style="display:none;"></div>
+                    </div>
                     <input type="number" name="foodGrams" placeholder="Amount (grams)" min="1" required>
                 </div>
             </div>
@@ -57,5 +124,11 @@
         </div>
     </div>
     <script src="../assets/js/add_custom_meal.js"></script>
+    <script>
+      // Quick auth check
+      if (!hasValidSessionLocal()) {
+        window.location.href = '/';
+      }
+    </script>
 </body>
 </html> 
